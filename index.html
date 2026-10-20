@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Toy Society Poverty Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap">
+<style>
+/* Layout: a lab bench. Controls on the left, the society drawn on the right, the numbers and their meaning underneath. Course look: navy and pale slate. */
+:root{
+  --bg:#F3F5F8; --panel:#FFFFFF; --ink:#14213D; --ink-2:#4A5672; --line:#D5DBE5;
+  --navy:#14213D; --ghost:#B7C0CF; --poor:#B23A48; --poor-soft:#F3D9DC;
+  --rel:#B23A48; --anc:#1F7A70; --abs:#9A6A12; --med:#14213D;
+  --good:#1F7A70; --bad:#B23A48; --chip:#E7EBF2; --focus:#2E5BBA;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1526; --panel:#162036; --ink:#E6EAF2; --ink-2:#A3AEC4; --line:#2B3854;
+  --navy:#9DB4E8; --ghost:#3C4A66; --poor:#E07A86; --poor-soft:#4A2630;
+  --rel:#E07A86; --anc:#5CC2B4; --abs:#D9A94A; --med:#C9D5F0;
+  --good:#5CC2B4; --bad:#E07A86; --chip:#22304C; --focus:#8FB0F5; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1526; --panel:#162036; --ink:#E6EAF2; --ink-2:#A3AEC4; --line:#2B3854;
+  --navy:#9DB4E8; --ghost:#3C4A66; --poor:#E07A86; --poor-soft:#4A2630;
+  --rel:#E07A86; --anc:#5CC2B4; --abs:#D9A94A; --med:#C9D5F0;
+  --good:#5CC2B4; --bad:#E07A86; --chip:#22304C; --focus:#8FB0F5; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 48px;display:grid;gap:20px}
+h1,h2,h3{font-family:var(--serif);text-wrap:balance;margin:0;font-weight:600}
+h1{font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.15}
+h2{font-size:1.3rem}
+h3{font-size:1.02rem}
+p{margin:0}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+.lede{max-width:68ch;color:var(--ink-2)}
+.sotd{font-family:var(--serif);font-style:italic;border-left:3px solid var(--navy);padding-left:12px;max-width:72ch}
+header{display:grid;gap:10px;padding-top:6px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:14px;min-width:0;align-content:start}
+.bench{display:grid;grid-template-columns:minmax(260px,330px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.bench{grid-template-columns:1fr}}
+@media (min-width:600px) and (max-width:860px){.bench > .panel:first-child{grid-template-columns:1fr 1fr;column-gap:24px}.bench > .panel:first-child > .ctl:first-child{grid-column:1/-1}.bench > .panel:first-child > hr{display:none}}
+input[type=checkbox]{accent-color:var(--navy)}
+.ctl{display:grid;gap:6px;min-width:0}
+.ctl select{width:100%;min-width:0}
+.ctl label,.ctl .lab{font-weight:600;font-size:.88rem}
+.hint{font-size:.82rem;color:var(--ink-2)}
+.seg{display:flex;flex-wrap:wrap;gap:4px;background:var(--chip);padding:3px;border-radius:8px}
+.seg button{flex:1 1 auto;border:0;background:transparent;color:var(--ink);font:inherit;font-size:.85rem;padding:6px 8px;border-radius:6px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.15);font-weight:600}
+.row{display:flex;gap:10px;align-items:center}
+input[type=range]{flex:1;accent-color:var(--navy);min-width:0}
+.val{font-family:var(--mono);font-size:.9rem;min-width:4.2em;text-align:right;font-variant-numeric:tabular-nums}
+select,input[type=number]{font:inherit;font-size:.9rem;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 7px}
+input[type=number]{font-family:var(--mono);width:5.2em}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-size:.84rem;padding:6px 10px;border-radius:999px;cursor:pointer}
+.btn:hover{border-color:var(--navy)}
+.btn.on{background:var(--navy);color:var(--panel);border-color:var(--navy)}
+.divider{border:0;border-top:1px solid var(--line);margin:2px 0}
+.chartbox{overflow-x:auto}
+.chartbox svg{display:block}
+svg text{font-family:var(--sans)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:10px;border-radius:2px;display:inline-block}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:2px;align-content:start}
+.tile .k{font-size:.78rem;color:var(--ink-2);font-weight:600}
+.tile .v{font-family:var(--mono);font-size:1.25rem;font-variant-numeric:tabular-nums}
+.tile .d{font-size:.8rem;font-family:var(--mono)}
+.up{color:var(--bad)} .down{color:var(--good)} .flat{color:var(--ink-2)}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2);font-weight:600}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+th.n{text-align:right}
+td.m{color:var(--ink-2);min-width:240px}
+.pill{display:inline-block;font-size:.74rem;font-weight:600;padding:1px 7px;border-radius:999px;background:var(--chip);color:var(--ink-2);white-space:nowrap}
+.pill.poor{background:var(--poor-soft);color:var(--poor)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+@media (max-width:860px){.two{grid-template-columns:1fr}}
+.heads{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.heads li{display:grid;grid-template-columns:7.5em 1fr;gap:10px;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.heads .src{font-size:.76rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.heads .hl{font-family:var(--serif);font-size:1.05rem;font-weight:600}
+.notes{display:grid;gap:6px;margin:0;padding-left:18px}
+.hh td input[type=number]{width:4.4em}
+.hh td.lbl{min-width:210px}
+.hh input[type=text]:not(.numtxt){font:inherit;font-size:.88rem;color:var(--ink);background:transparent;border:1px solid transparent;border-radius:4px;padding:3px 4px;width:100%}
+.hh input[type=text]:not(.numtxt):hover,.hh input[type=text]:not(.numtxt):focus{border-color:var(--line)}
+.x{border:0;background:transparent;color:var(--ink-2);cursor:pointer;font-size:1rem;padding:2px 6px}
+.x:hover{color:var(--bad)}
+.eq{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.eq{grid-template-columns:1fr 1fr}}
+.eq .out{font-family:var(--mono);font-size:.95rem}
+.tasks{display:grid;gap:10px;margin:0;padding-left:20px}
+.tasks li::marker{font-family:var(--serif);font-weight:700}
+.gloss{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px}
+@media (max-width:720px){.gloss{grid-template-columns:1fr}}
+.gloss div{display:grid;gap:2px;align-content:start}
+.gloss b{font-family:var(--serif);font-size:1rem}
+.gloss span{color:var(--ink-2);font-size:.9rem}
+.numtxt{font-family:var(--mono);width:5.2em;font-size:.9rem;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 7px}
+#eqInc{font-family:var(--mono);font-size:.9rem;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:7em}
+@media (pointer:coarse){
+  input[type=checkbox]{width:24px;height:24px}
+  .x{min-width:40px;min-height:40px;font-size:1.25rem}
+  input[type=number],input[type=text],select,.numtxt,#eqInc{min-height:40px;font-size:16px}
+  .seg button,.btn{min-height:40px}
+  input[type=range]{height:32px}
+}
+@media (max-width:600px){
+  .heads li{grid-template-columns:1fr;gap:0}
+  #nums thead,#lines3 thead,#hh thead{display:none}
+  #nums tr,#lines3 tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 10px;border-bottom:1px solid var(--line);padding:8px 0}
+  #nums td,#lines3 td,#hh td{border:0;padding:0}
+  #nums td.ni,#nums td.m,#lines3 td:first-child{grid-column:1/-1}
+  #nums td.m{min-width:0;font-size:.86rem}
+  #nums td.n,#lines3 td.n,#hh td.n{text-align:left}
+  #nums td[data-l]::before,#lines3 td[data-l]::before,#hh td[data-l]::before{content:attr(data-l);display:block;font-family:var(--sans);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2)}
+  #hh tbody tr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 8px;align-items:end;border-bottom:1px solid var(--line);padding:10px 0}
+  #hh td.hn{display:none}
+  #hh td.lbl{grid-row:1;grid-column:1/4;min-width:0}
+  #hh td.hx{grid-row:1;grid-column:4;justify-self:end;align-self:center}
+  #hh td.hs{grid-column:3/-1;align-self:center}
+  #hh td input[type=number],#hh .numtxt{width:100%}
+}
+footer{font-size:.8rem;color:var(--ink-2);max-width:80ch}
+</style>
+</head><body>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Redistribution Policy and Politics 2026–27 · Session 4 · How much poverty, and how do we know?</div>
+  <h1>Toy Society Poverty Lab</h1>
+  <p class="lede">Ten households, the same ones as on the Session 4 worksheet. Change a benefit, the economy or the incomes themselves, and watch what happens to the poverty rate, the poverty gap and inequality. Incomes are monthly and already adjusted for household size ("per equivalent adult").</p>
+  <p class="sotd">A poverty number is the answer to four decisions; change one decision and the number changes, so a good diagnosis states its decisions and uses more than one number.</p>
+</header>
+
+<section class="bench">
+  <div class="panel" aria-label="Controls">
+    <div class="ctl">
+      <span class="lab">Start from a scenario</span>
+      <div class="presets" id="presets"></div>
+      <p class="hint" id="presetNote"></p>
+    </div>
+    <hr class="divider">
+    <div class="ctl">
+      <label for="benAmt">Benefit: add to each eligible household</label>
+      <div class="row"><input type="range" id="benAmt" min="0" max="30" step="1"><span class="val" id="benAmtV"></span></div>
+      <label for="benTarget" class="hint">Who gets it?</label>
+      <select id="benTarget">
+        <option value="children">Households with children (universal, like 800+)</option>
+        <option value="all">Every household</option>
+        <option value="pensioners">Pensioner households only</option>
+        <option value="poor">Only households below the relative line before the change (means-tested)</option>
+      </select>
+    </div>
+    <div class="ctl">
+      <label for="earn">Economy: earnings change</label>
+      <div class="row"><input type="range" id="earn" min="-40" max="40" step="5"><span class="val" id="earnV"></span></div>
+      <label for="pens">Pensions change</label>
+      <div class="row"><input type="range" id="pens" min="-40" max="40" step="5"><span class="val" id="pensV"></span></div>
+      <label for="top">Extra change for the richest household</label>
+      <div class="row"><input type="range" id="top" min="-50" max="200" step="10"><span class="val" id="topV"></span></div>
+    </div>
+    <hr class="divider">
+    <div class="ctl">
+      <span class="lab" id="lineLab">Which poverty line?</span>
+      <div class="seg" role="group" aria-labelledby="lineLab" id="lineSeg">
+        <button type="button" data-v="relative">Relative</button>
+        <button type="button" data-v="anchored">Anchored</button>
+        <button type="button" data-v="absolute">Absolute</button>
+      </div>
+      <p class="hint" id="lineHint"></p>
+    </div>
+    <div class="ctl">
+      <label for="relPct">Relative and anchored line: share of the median</label>
+      <div class="row"><input type="range" id="relPct" min="40" max="70" step="5"><span class="val" id="relPctV"></span></div>
+      <label for="absLine">Absolute line (cost of a basic basket)</label>
+      <div class="row"><input type="range" id="absLine" min="0" max="30" step="1"><span class="val" id="absLineV"></span></div>
+    </div>
+    <div class="ctl">
+      <span class="lab" id="unitLab">Count whom?</span>
+      <div class="seg" role="group" aria-labelledby="unitLab" id="unitSeg">
+        <button type="button" data-v="households">Households</button>
+        <button type="button" data-v="people">People</button>
+      </div>
+      <p class="hint" id="unitHint"></p>
+    </div>
+  </div>
+
+  <div class="panel" aria-label="The toy society">
+    <div style="display:grid;gap:4px">
+      <h2>The society, poorest to richest</h2>
+      <p class="hint" id="chartCap"></p>
+    </div>
+    <div class="chartbox"><svg id="chart" viewBox="0 0 760 360" width="100%" role="img" aria-label="Bar chart of household incomes before and after, with poverty lines"></svg></div>
+    <div class="legend" id="legend"></div>
+    <div class="tiles" id="tiles"></div>
+  </div>
+</section>
+
+<section class="two">
+  <div class="panel">
+    <div style="display:grid;gap:4px">
+      <h2>One change, five headlines</h2>
+      <p class="hint">Each newspaper picked a different number. All of them are true.</p>
+    </div>
+    <ul class="heads" id="heads"></ul>
+    <div style="display:grid;gap:6px">
+      <h3>Who crossed the line?</h3>
+      <ul class="notes" id="crossers"></ul>
+    </div>
+  </div>
+  <div class="panel">
+    <div style="display:grid;gap:4px">
+      <h2>Same society, three lines</h2>
+      <p class="hint">Before → after, for every line at once.</p>
+    </div>
+    <div class="tablebox"><table id="lines3"></table></div>
+    <p class="hint" id="costNote"></p>
+  </div>
+</section>
+
+<section class="panel">
+  <div style="display:grid;gap:4px">
+    <h2>All the numbers, and what they mean</h2>
+    <p class="hint" id="numsCap"></p>
+  </div>
+  <div class="tablebox"><table id="nums"></table></div>
+</section>
+
+<section class="two">
+  <div class="panel">
+    <div style="display:grid;gap:4px">
+      <h2>Lorenz curve</h2>
+      <p class="hint">Line up everyone from poorest to richest and add up their incomes. If everyone had the same, the curve would be the diagonal. The Gini is the gap between the diagonal and the curve: the shaded area, as a share of the whole triangle under the diagonal.</p>
+    </div>
+    <svg id="lorenz" viewBox="0 0 340 320" width="100%" style="max-width:420px" role="img" aria-label="Lorenz curves before and after"></svg>
+    <div class="legend"><span><i class="sw" style="background:var(--ghost)"></i>Before</span><span><i class="sw" style="background:var(--navy)"></i>After</span></div>
+  </div>
+  <div class="panel">
+    <div style="display:grid;gap:4px">
+      <h2>Why "per equivalent adult"?</h2>
+      <p class="hint">A family of five does not need five times what a single person needs: they share a kitchen and a fridge. An equivalence scale divides household income by a number of "equivalent adults".</p>
+    </div>
+    <div class="eq">
+      <div class="ctl"><label for="eqInc">Household income</label><input type="text" inputmode="decimal" id="eqInc" value="2715"></div>
+      <div class="ctl"><label for="eqAd">Adults (14+)</label><input type="number" id="eqAd" min="1" max="10" step="1" value="2"></div>
+      <div class="ctl"><label for="eqCh">Children (under 14)</label><input type="number" id="eqCh" min="0" max="10" step="1" value="3"></div>
+    </div>
+    <div class="tablebox"><table id="eqOut"></table></div>
+    <p class="hint">The example is the Wójcik family from Session 3: PLN 2,715 for two adults and three children. Per equivalent adult they have about PLN 1,131, below the line for a single person, although the family total looks far above it. Different scales move different families above or below the line, which is why reports often check both.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <div style="display:grid;gap:4px">
+    <h2>The households</h2>
+    <p class="hint">Type new incomes, change who lives in each household, add or remove households. "Before" is the starting income; "after" adds the economy change and the benefit. Household size matters only when you count people.</p>
+  </div>
+  <div class="tablebox"><table class="hh" id="hh"></table></div>
+  <div class="row" style="flex-wrap:wrap"><button type="button" class="btn" id="addHh">Add a household</button><button type="button" class="btn" id="resetHh">Restore the worksheet households</button></div>
+</section>
+
+<section class="two">
+  <div class="panel">
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li>Make household 3 (the pensioner living alone) poor <em>without changing her income</em>. Which line can do that, and which cannot?</li>
+      <li>Find the smallest benefit to households with children that brings the anchored poverty rate to zero. Then compare its cost with the poverty gap before the change.</li>
+      <li>Raise only the richest household's income by 100%. What happens to the poverty rate, the gap, S80/S20 and the Gini? Is this society now "worse"?</li>
+      <li>Switch from households to people. Why does the poverty rate go up, although no income changed?</li>
+      <li>Run the recession. Which line tells you that people got poorer? Which one hides it?</li>
+      <li>Make a benefit means-tested, then universal, with the same amount. Which one costs less, and which one cuts the gap more per unit spent?</li>
+    </ol>
+  </div>
+  <div class="panel">
+    <h2>Words used here</h2>
+    <div class="gloss">
+      <div><b>Median</b><span>Sort everyone from poorest to richest; the median is the income of the person in the middle. With an even number, take the average of the two middle values: for 10, 14, 18, 22, <u>26, 30</u>, 36, 44, 60, 140 it is (26 + 30) ÷ 2 = 28. One very rich household does not move it.</span></div>
+      <div><b>Mean</b><span>Total income divided by the number of people (or households). One very rich household pulls it up.</span></div>
+      <div><b>Relative line</b><span>A share (usually 60%) of this year's median. Poverty means falling behind the normal standard of living. It moves when the median moves. This is the EU "at risk of poverty" line.</span></div>
+      <div><b>Anchored line</b><span>The relative line of a starting year, kept fixed (only adjusted for prices). It shows whether the poor are better off than they were.</span></div>
+      <div><b>Absolute line</b><span>The cost of a basket of basic needs, adjusted only for prices. Poland's extreme poverty line (the subsistence minimum) and the World Bank's $3.00 and $8.30 a day lines (2021 prices, PPP) are absolute.</span></div>
+      <div><b>Poverty rate (headcount)</b><span>The share below the line. Statistics offices count people, not households. It does not care whether someone misses the line by 1 or by 10.</span></div>
+      <div><b>Poverty gap</b><span>For each poor person, the shortfall: line minus income. Add up the shortfalls. That is the amount a perfectly targeted transfer would need to end poverty. The gap index divides it by (line × everyone).</span></div>
+      <div><b>S80/S20</b><span>Income of the richest 20% divided by the income of the poorest 20%.</span></div>
+      <div><b>Palma ratio</b><span>Income of the richest 10% divided by the income of the poorest 40%.</span></div>
+      <div><b>Gini coefficient</b><span>0 if everyone has the same income, 1 if one person has everything. Often written ×100 (Poland about 28–30). It sees the whole distribution, but the same Gini can hide very different societies.</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>Built for Session 4 (23 October 2026). The toy society and its worksheet key are in "Session 4 – 23 Oct 2026 – plan.md". A person (or household) is poor when income is strictly below the line. Gini is computed from the Lorenz curve; with equal weights this equals the mean absolute difference formula used for the worksheet key. The units are toy units (think PLN 100); who pays for the benefit is a question for Session 7.</footer>
+</div>
+
+<script>
+(function(){
+const BASE = [
+  {label:"Couple, three children (the Wójciks)", adults:2, children:3, pensioner:false, income:10},
+  {label:"Lone parent, two children", adults:1, children:2, pensioner:false, income:14},
+  {label:"Pensioner living alone", adults:1, children:0, pensioner:true, income:18},
+  {label:"Couple, two children, one earner", adults:2, children:2, pensioner:false, income:22},
+  {label:"Couple, one child", adults:2, children:1, pensioner:false, income:26},
+  {label:"Pensioner couple", adults:2, children:0, pensioner:true, income:30},
+  {label:"Couple, two children, two earners", adults:2, children:2, pensioner:false, income:36},
+  {label:"Young single worker", adults:1, children:0, pensioner:false, income:44},
+  {label:"Couple without children, two earners", adults:2, children:0, pensioner:false, income:60},
+  {label:"Business owner, couple, one child", adults:2, children:1, pensioner:false, income:140}
+];
+const PRESETS = [
+  {id:"class", name:"Worksheet: +6 for families", set:{amt:6,target:"children",earn:0,pens:0,top:0},
+   note:"Activity 1, Part B: the state pays +6 to every household with children, the rich one included (800+ is universal)."},
+  {id:"growth", name:"Wages grow, pensions frozen", set:{amt:0,target:"children",earn:20,pens:0,top:0},
+   note:"Earnings rise 20%, pensions stay the same. Nobody is worse off. Watch the relative rate and the pensioners."},
+  {id:"recession", name:"Recession", set:{amt:0,target:"children",earn:-30,pens:0,top:0},
+   note:"Earnings fall 30%, pensions are protected. Everyone who works is poorer. Compare the relative and the anchored line."},
+  {id:"top", name:"Only the top gets richer", set:{amt:0,target:"children",earn:0,pens:0,top:100},
+   note:"The richest household doubles its income. Nobody else changes."},
+  {id:"means", name:"Means-tested +6", set:{amt:6,target:"poor",earn:0,pens:0,top:0},
+   note:"The same +6, but only for households below the relative line before the change. Compare the cost with the worksheet case."},
+  {id:"none", name:"No change", set:{amt:0,target:"children",earn:0,pens:0,top:0},
+   note:"Before and after are the same. Use it to explore the starting society, or edit the incomes below."}
+];
+const clone = a => a.map(o => Object.assign({}, o));
+const S = {hh: clone(BASE), amt:0, target:"children", earn:0, pens:0, top:0, line:"relative", relPct:60, absLine:12, unit:"households", preset:"none"};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f1 = x => (x == null || !isFinite(x)) ? "—" : (Math.round(x*10)/10).toLocaleString("en-GB",{minimumFractionDigits:Math.abs(Math.round(x*10)%10)?1:0, maximumFractionDigits:1});
+const f2 = x => (x == null || !isFinite(x)) ? "—" : x.toFixed(2);
+const pct = x => (x == null || !isFinite(x)) ? "—" : f1(x*100) + "%";
+const num = v => { let t = String(v).trim().replace(/[\s\u00a0]/g,""); if (/^\d{1,3}(,\d{3})+$/.test(t)) t = t.replace(/,/g,""); else t = t.replace(",", "."); const n = parseFloat(t); return isFinite(n) ? n : 0; };
+const size = h => Math.max(1, (+h.adults||0) + (+h.children||0));
+const oecd = h => 1 + 0.5*Math.max(0,(+h.adults||1)-1) + 0.3*(+h.children||0);
+
+/* ---------- statistics (weighted, so the same code counts households or people) ---------- */
+function pairs(ys, ws){ return ys.map((y,i)=>({y:Math.max(0,y), w:ws[i], i})).sort((a,b)=>a.y-b.y || a.i-b.i); }
+function median(P){
+  const W = P.reduce((s,p)=>s+p.w,0); let c = 0;
+  for (let k=0;k<P.length;k++){ c += P[k].w;
+    if (Math.abs(c - W/2) < 1e-9) return k+1<P.length ? (P[k].y+P[k+1].y)/2 : P[k].y;
+    if (c > W/2) return P[k].y; }
+  return NaN;
+}
+function lowerShare(P, p){
+  const W = P.reduce((s,q)=>s+q.w,0), T = P.reduce((s,q)=>s+q.w*q.y,0); if (T<=0) return NaN;
+  const target = p*W; let acc=0, inc=0;
+  for (const q of P){ if (acc + q.w <= target + 1e-9){ acc += q.w; inc += q.w*q.y; } else { inc += (target-acc)*q.y; break; } }
+  return inc/T;
+}
+function lorenz(P){
+  const W = P.reduce((s,q)=>s+q.w,0), T = P.reduce((s,q)=>s+q.w*q.y,0);
+  const pts=[[0,0]]; let cw=0, ci=0;
+  for (const q of P){ cw+=q.w; ci+=q.w*q.y; pts.push([cw/W, T>0?ci/T:cw/W]); }
+  return pts;
+}
+function gini(P){
+  const L = lorenz(P); let s=0;
+  for (let k=1;k<L.length;k++) s += (L[k][0]-L[k-1][0])*(L[k][1]+L[k-1][1]);
+  return 1 - s;
+}
+function poverty(P, z){
+  const W = P.reduce((s,q)=>s+q.w,0); let wp=0, gap=0;
+  for (const q of P) if (q.y < z - 1e-9){ wp += q.w; gap += q.w*(z-q.y); }
+  return {rate: W? wp/W : NaN, count: wp, gap, index: (W && z>0) ? gap/(W*z) : NaN, W};
+}
+function describe(ys, ws){
+  const P = pairs(ys, ws), W = P.reduce((s,q)=>s+q.w,0), T = P.reduce((s,q)=>s+q.w*q.y,0);
+  const b20 = lowerShare(P,.2), b40 = lowerShare(P,.4), b80 = lowerShare(P,.8), b90 = lowerShare(P,.9);
+  return {P, W, mean: W?T/W:NaN, median: median(P), s8020: b20>0 ? (1-b80)/b20 : NaN, palma: b40>0 ? (1-b90)/b40 : NaN, gini: gini(P)};
+}
+
+/* ---------- the model ---------- */
+function model(){
+  const hh = S.hh, n = hh.length;
+  const before = hh.map(h => Math.max(0, +h.income || 0));
+  const ws = hh.map(h => S.unit === "people" ? size(h) : 1);
+  const B = describe(before, ws);
+  const relB = S.relPct/100 * B.median;
+  let richest = 0; before.forEach((y,i)=>{ if (y > before[richest]) richest = i; });
+  const ben = hh.map((h,i) => {
+    if (S.amt <= 0) return 0;
+    if (S.target === "all") return S.amt;
+    if (S.target === "children") return (+h.children>0) ? S.amt : 0;
+    if (S.target === "pensioners") return h.pensioner ? S.amt : 0;
+    if (S.target === "poor") return before[i] < relB - 1e-9 ? S.amt : 0;
+    return 0;
+  });
+  const after = hh.map((h,i) => {
+    let y = before[i] * (1 + (h.pensioner ? S.pens : S.earn)/100);
+    if (i === richest && S.top) y *= (1 + S.top/100);
+    return Math.max(0, Math.round((y + ben[i])*100)/100);
+  });
+  const A = describe(after, ws);
+  const lines = {
+    relative: {b: relB, a: S.relPct/100 * A.median},
+    anchored: {b: relB, a: relB},
+    absolute: {b: S.absLine, a: S.absLine}
+  };
+  const pov = {};
+  for (const k in lines) pov[k] = {b: poverty(B.P, lines[k].b), a: poverty(A.P, lines[k].a)};
+  const recipients = ben.filter(x=>x>0).length;
+  return {hh, n, before, after, ws, ben, B, A, lines, pov, richest, cost: ben.reduce((s,x)=>s+x,0), recipients};
+}
+
+/* ---------- words ---------- */
+const unitWord = () => S.unit === "people" ? "people" : "households";
+function chg(b, a, lowerIsGood=true, fmt=f1, rel=false){
+  if (!isFinite(b) || !isFinite(a)) return '<span class="flat">—</span>';
+  const d = a - b; if (Math.abs(d) < 1e-9) return '<span class="flat">no change</span>';
+  const cls = (d<0) === lowerIsGood ? "down" : "up";
+  let s = (d>0?"+":"−") + fmt(Math.abs(d));
+  if (rel && b) s += " (" + (d>0?"+":"−") + f1(Math.abs(d/b)*100) + "%)";
+  return '<span class="'+cls+'">'+s+'</span>';
+}
+const LINE_NAME = {relative:"relative line", anchored:"anchored line", absolute:"absolute line"};
+function lineHint(){
+  if (S.line === "relative") return "Relative: "+S.relPct+"% of the median of the moment. If the median rises, the line rises with it.";
+  if (S.line === "anchored") return "Anchored: "+S.relPct+"% of the median before the change, then kept fixed. It asks: are the poor better off than before?";
+  return "Absolute: a fixed basket that costs "+f1(S.absLine)+". It asks: can people afford the basics?";
+}
+function headline(name, b, a){
+  if (!isFinite(b)||!isFinite(a)) return "No data";
+  const B = pct(b), Aa = pct(a);
+  if (Math.abs(a-b) < 1e-9) return b===0 ? "Still no poverty" : "Poverty unchanged at "+B;
+  if (a === 0) return "Poverty eliminated (" + B + " → 0%)";
+  if (Math.abs(a - b/2) < 1e-9) return "Poverty halved (" + B + " → " + Aa + ")";
+  if (b === 0) return "Poverty appears: 0% → " + Aa;
+  return (a<b ? "Poverty falls: " : "Poverty rises: ") + B + " → " + Aa;
+}
+
+/* ---------- rendering ---------- */
+function setSeg(id, v){ $(id).querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v===v))); }
+function renderControls(){
+  $("benAmt").value = S.amt; $("benAmtV").textContent = "+" + S.amt;
+  $("benTarget").value = S.target;
+  $("earn").value = S.earn; $("earnV").textContent = (S.earn>0?"+":"") + S.earn + "%";
+  $("pens").value = S.pens; $("pensV").textContent = (S.pens>0?"+":"") + S.pens + "%";
+  $("top").value = S.top; $("topV").textContent = (S.top>0?"+":"") + S.top + "%";
+  $("relPct").value = S.relPct; $("relPctV").textContent = S.relPct + "%";
+  $("absLine").value = S.absLine; $("absLineV").textContent = S.absLine;
+  setSeg("lineSeg", S.line); setSeg("unitSeg", S.unit);
+  $("lineHint").textContent = lineHint();
+  $("unitHint").textContent = S.unit === "people"
+    ? "Each household counts as many times as it has members, as statistics offices do. Bars get wider for bigger households."
+    : "Each household counts once, as on the worksheet. Statistics offices count people: try the other button.";
+  const p = PRESETS.find(p=>p.id===S.preset);
+  $("presetNote").textContent = p ? p.note : "Your own scenario.";
+  $("presets").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.id===S.preset));
+}
+
+function chart(M){
+  const svg = $("chart"), cw = svg.parentNode.clientWidth || 760, narrow = cw < 560;
+  const Wd = Math.max(300, Math.min(760, cw)), Ht = narrow ? 320 : 360, L = narrow ? 30 : 46, R = narrow ? 70 : 112, T = 18, Bm = 52;
+  svg.setAttribute("viewBox", "0 0 "+Wd+" "+Ht);
+  const pw = Wd-L-R, ph = Ht-T-Bm;
+  const order = M.after.map((y,i)=>i).sort((a,b)=>M.after[a]-M.after[b] || a-b);
+  const z = M.lines[S.line], zA = z.a, zB = z.b;
+  const vals = M.after.map((a,i)=>Math.max(a, M.before[i])).sort((a,b)=>a-b);
+  const maxV = vals[vals.length-1] || 1, second = vals.length>1 ? vals[vals.length-2] : maxV;
+  const refs = [M.lines.relative.a, M.lines.relative.b, S.absLine, M.A.median, M.B.median];
+  let cap = Math.max(second*1.2, Math.max(...refs)*1.4, 10);
+  if (maxV <= cap*1.15) cap = maxV*1.05;
+  const step = cap > 120 ? 40 : cap > 60 ? 20 : cap > 25 ? 10 : 5;
+  cap = Math.ceil(cap/step)*step;
+  const y = v => T + ph - Math.min(v,cap)/cap*ph;
+  const totalW = order.reduce((s,i)=>s+M.ws[i],0);
+  const gapPx = narrow ? 3 : 6, usable = pw - gapPx*(order.length-1);
+  let x = L, out = [];
+  for (let v=0; v<=cap+1e-9; v+=step){
+    out.push('<line x1="'+L+'" x2="'+(L+pw)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--line)" stroke-width="1"/>');
+    out.push('<text x="'+(L-8)+'" y="'+(y(v)+4)+'" text-anchor="end" font-size="11" fill="var(--ink-2)">'+v+'</text>');
+  }
+  out.push('<defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="var(--poor-soft)"/><line x1="0" y1="0" x2="0" y2="6" stroke="var(--poor)" stroke-width="2"/></pattern></defs>');
+  const gridEnd = out.length, ln = [];
+  order.forEach(i => {
+    const w = Math.max(8, usable * M.ws[i]/totalW), a = M.after[i], b = M.before[i];
+    const poor = a < zA - 1e-9, wasPoor = b < zB - 1e-9;
+    const top = y(a), base = y(0);
+    // shortfall
+    if (poor) out.push('<rect x="'+x+'" y="'+y(zA)+'" width="'+w+'" height="'+(top-y(zA))+'" fill="url(#hatch)"><title>Shortfall '+f1(zA-a)+'</title></rect>');
+    out.push('<rect x="'+x+'" y="'+top+'" width="'+w+'" height="'+(base-top)+'" rx="2" fill="'+(poor?"var(--poor)":"var(--navy)")+'"><title>Household '+(i+1)+': '+esc(M.hh[i].label)+'. Before '+f1(b)+', after '+f1(a)+(poor?'. Below the line.':'')+'</title></rect>');
+    if (Math.abs(a-b) > 1e-9){
+      if (b <= cap){ out.push('<line x1="'+(x+1)+'" x2="'+(x+w-1)+'" y1="'+y(b)+'" y2="'+y(b)+'" stroke="var(--panel)" stroke-width="4"/>');
+      out.push('<line x1="'+(x+1)+'" x2="'+(x+w-1)+'" y1="'+y(b)+'" y2="'+y(b)+'" stroke="var(--ink)" stroke-width="2" stroke-dasharray="4 2"/>'); }
+    }
+    if (a > cap){
+      const yy = T + 14;
+      out.push('<path d="M'+x+' '+(yy)+' l'+(w/4)+' -5 l'+(w/4)+' 5 l'+(w/4)+' -5 l'+(w/4)+' 5" stroke="var(--panel)" stroke-width="3" fill="none"/>');
+      out.push('<text x="'+(x+w/2)+'" y="'+(T+30)+'" text-anchor="middle" font-size="10.5" fill="var(--panel)" font-weight="600">'+f1(a)+'</text>');
+    } else {
+      out.push('<text x="'+(x+w/2)+'" y="'+(top-5)+'" text-anchor="middle" font-size="'+(narrow?9.5:10.5)+'" fill="var(--ink)" font-family="var(--mono)">'+(narrow?Math.round(a):f1(a))+'</text>');
+    }
+    out.push('<text x="'+(x+w/2)+'" y="'+(base+16)+'" text-anchor="middle" font-size="'+(narrow?10:11.5)+'" font-weight="600" fill="'+(poor?"var(--poor)":"var(--ink)")+'">'+(narrow?"":"#")+(i+1)+'</text>');
+    const tag = narrow ? (M.hh[i].pensioner?"P":"") + (+M.hh[i].children>0?"K":"") : (M.hh[i].pensioner?"pens.":"") + (+M.hh[i].children>0?(M.hh[i].pensioner?" ":"")+"kids":"");
+    out.push('<text x="'+(x+w/2)+'" y="'+(base+30)+'" text-anchor="middle" font-size="9.5" fill="var(--ink-2)">'+(S.unit==="people"? size(M.hh[i])+"p" : "")+(S.unit==="people"&&tag?" ":"")+tag+'</text>');
+    if (wasPoor !== poor) out.push('<text x="'+(x+w/2)+'" y="'+(base+43)+'" text-anchor="middle" font-size="9.5" font-weight="600" fill="'+(poor?"var(--poor)":"var(--good)")+'">'+(narrow ? (poor?"new":"out") : (poor?"now poor":"left poverty"))+'</text>');
+    x += w + gapPx;
+  });
+  const hline = (v, color, label, dash, wgt) => {
+    if (!isFinite(v) || v > cap) return;
+    ln.push('<line x1="'+L+'" x2="'+(L+pw)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="'+color+'" stroke-width="'+wgt+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>');
+  };
+  const labs = [];
+  labs.push({v:M.A.median, c:"var(--med)", t:(narrow?"med. ":"median ")+f1(M.A.median), d:"6 4", w:1.5});
+  const lc = {relative:"var(--rel)", anchored:"var(--anc)", absolute:"var(--abs)"}[S.line];
+  if (S.line==="relative" && Math.abs(zB-zA)>1e-9) labs.push({v:zB, c:lc, t:(narrow?"was ":"line before ")+f1(zB), d:"2 3", w:1.5});
+  labs.push({v:zA, c:lc, t:(narrow?"line ":S.line==="relative"?"line ":S.line==="anchored"?"anchored ":"basket ")+f1(zA), d:"", w:2.5});
+  // spread labels so they do not overlap
+  labs.sort((a,b)=>b.v-a.v); let lastY = -1e9;
+  labs.forEach(l => { hline(l.v, l.c, "", l.d, l.w); });
+  out.splice(gridEnd, 0, ...ln);
+  labs.forEach(l => { if (!isFinite(l.v)||l.v>cap) return; let yy = y(l.v)+4; if (yy - lastY < 13) yy = lastY + 13; lastY = yy;
+    out.push('<text x="'+(L+pw+6)+'" y="'+yy+'" font-size="11" fill="'+l.c+'" font-weight="600">'+l.t+'</text>'); });
+  out.push('<line x1="'+L+'" x2="'+(L+pw)+'" y1="'+y(0)+'" y2="'+y(0)+'" stroke="var(--ink-2)" stroke-width="1"/>');
+  svg.innerHTML = out.join("");
+  $("chartCap").textContent = (narrow ? "Numbers under the bars are households; K = children, P = pensioners. " : "") + "Bars show income after the change; a dashed mark shows where a household was before. Red bars are below the " + LINE_NAME[S.line] + "; the hatched part is each one's shortfall, and all shortfalls together are the poverty gap.";
+  const leg = [
+    ['<i class="sw" style="background:var(--navy)"></i>Above the line'],
+    ['<i class="sw" style="background:var(--poor)"></i>Below the line'],
+    ['<i class="sw" style="background:repeating-linear-gradient(45deg,var(--poor) 0 2px,var(--poor-soft) 2px 5px)"></i>Shortfall (the gap)'],
+    ['<i class="sw" style="border-top:2px dashed var(--ink);height:0;border-radius:0"></i>Income before'],
+  ];
+  $("legend").innerHTML = leg.map(l=>"<span>"+l[0]+"</span>").join("");
+}
+
+function tiles(M){
+  const p = M.pov[S.line];
+  const t = [
+    ["Poverty rate", pct(p.b.rate), pct(p.a.rate), chg(p.b.rate*100, p.a.rate*100, true, v=>f1(v)+" pts")],
+    ["Poverty gap", f1(p.b.gap), f1(p.a.gap), chg(p.b.gap, p.a.gap, true, f1, true)],
+    ["Median", f1(M.B.median), f1(M.A.median), chg(M.B.median, M.A.median, false)],
+    ["Gini", f2(M.B.gini), f2(M.A.gini), chg(M.B.gini, M.A.gini, true, f2)]
+  ];
+  $("tiles").innerHTML = t.map(r => '<div class="tile"><span class="k">'+r[0]+'</span><span class="v">'+r[2]+'</span><span class="d"><span class="flat">was '+r[1]+'</span> · '+r[3]+'</span></div>').join("");
+}
+
+function heads(M){
+  const r = M.pov.relative, an = M.pov.anchored, ab = M.pov.absolute, cur = M.pov[S.line];
+  let gapLine;
+  if (cur.b.gap === 0 && cur.a.gap === 0) gapLine = "No poverty gap to close";
+  else if (cur.b.gap === 0) gapLine = "A poverty gap opens: 0 → " + f1(cur.a.gap);
+  else { const d = (cur.a.gap - cur.b.gap)/cur.b.gap; gapLine = Math.abs(d)<1e-9 ? "Poverty gap unchanged at " + f1(cur.a.gap) : d<0 ? "Poverty gap shrinks by " + f1(-d*100) + "% (" + f1(cur.b.gap) + " → " + f1(cur.a.gap) + ")" : "Poverty gap grows by " + f1(d*100) + "% (" + f1(cur.b.gap) + " → " + f1(cur.a.gap) + ")"; }
+  const gB = M.B.gini, gA = M.A.gini;
+  const giniLine = Math.abs(gA-gB) < 0.005 ? "Inequality unchanged (Gini " + f2(gA) + ")" : (gA<gB ? "Inequality falls" : "Inequality rises") + " (Gini " + f2(gB) + " → " + f2(gA) + ")";
+  const rows = [
+    ["Relative line", "var(--rel)", headline("rel", r.b.rate, r.a.rate)],
+    ["Anchored line", "var(--anc)", headline("anc", an.b.rate, an.a.rate)],
+    ["Basket of " + f1(S.absLine), "var(--abs)", headline("abs", ab.b.rate, ab.a.rate)],
+    ["Gap, " + (S.line==="absolute"?"basket":S.line), "var(--ink-2)", gapLine],
+    ["Gini", "var(--ink-2)", giniLine]
+  ];
+  $("heads").innerHTML = rows.map(x => '<li><span class="src" style="color:'+x[1]+'">'+x[0]+'</span><span class="hl">'+esc(x[2])+'</span></li>').join("");
+
+  const z = M.lines[S.line], notes = [];
+  M.hh.forEach((h,i) => {
+    const b = M.before[i], a = M.after[i], wp = b < z.b - 1e-9, np = a < z.a - 1e-9;
+    const who = "Household " + (i+1) + " (" + h.label.charAt(0).toLowerCase() + h.label.slice(1) + ")";
+    if (!wp && np){
+      if (a >= b - 1e-9) notes.push(who + " is now counted as poor although its income " + (a>b+1e-9 ? "rose from " + f1(b) + " to " + f1(a) : "did not change (" + f1(b) + ")") + ". The line moved up from " + f1(z.b) + " to " + f1(z.a) + " because the median rose.");
+      else notes.push(who + " fell below the line: income " + f1(b) + " → " + f1(a) + ", line " + f1(z.a) + ".");
+    } else if (wp && !np){
+      if (a <= b + 1e-9) notes.push(who + " left poverty although its income " + (a<b-1e-9?"fell":"did not change") + ": the line fell from " + f1(z.b) + " to " + f1(z.a) + " because the median fell.");
+      else notes.push(who + " left poverty: income " + f1(b) + " → " + f1(a) + ", line " + f1(z.a) + ".");
+    } else if (wp && np && a > b + 1e-9){
+      notes.push(who + " is still poor, but its shortfall shrank from " + f1(z.b-b) + " to " + f1(z.a-a) + ". The headcount does not see this; the gap does.");
+    }
+  });
+  $("crossers").innerHTML = notes.length ? notes.map(n=>"<li>"+esc(n)+"</li>").join("") : "<li>Nobody crossed the " + LINE_NAME[S.line] + ".</li>";
+}
+
+function lines3(M){
+  const u = unitWord();
+  const row = (k, name, color, hint) => {
+    const p = M.pov[k], l = M.lines[k];
+    return '<tr><td><b style="color:'+color+'">'+name+'</b><br><span class="hint">'+hint+'</span></td><td class="n" data-l="Line">'+f1(l.b)+' → '+f1(l.a)+'</td><td class="n" data-l="Rate">'+pct(p.b.rate)+' → '+pct(p.a.rate)+'</td><td class="n" data-l="Gap">'+f1(p.b.gap)+' → '+f1(p.a.gap)+'</td></tr>';
+  };
+  $("lines3").innerHTML = '<thead><tr><th>Line</th><th class="n">Line value</th><th class="n">Poverty rate</th><th class="n">Gap</th></tr></thead><tbody>' +
+    row("relative","Relative","var(--rel)", S.relPct+"% of the median now") +
+    row("anchored","Anchored","var(--anc)", S.relPct+"% of the median before") +
+    row("absolute","Absolute","var(--abs)", "basket, fixed") + '</tbody>';
+  let c = "";
+  if (S.amt > 0){
+    c = "The benefit goes to " + M.recipients + " of " + M.n + " households and costs " + f1(M.cost) + " (in the toy's units).";
+    if (S.unit === "households"){
+      const g = M.pov[S.line].b.gap;
+      c += g > 0 ? " Closing the whole gap at the " + LINE_NAME[S.line] + " before the change would have cost " + f1(g) + " with perfect targeting. Perfect targeting does not exist, but the comparison shows how much of the money reached the poor." : " Before the change there was no gap at the " + LINE_NAME[S.line] + ".";
+    }
+  } else c = "No benefit is paid in this scenario.";
+  $("costNote").textContent = c;
+}
+
+function nums(M){
+  const p = M.pov[S.line], z = M.lines[S.line], u = unitWord();
+  const W = p.a.W;
+  const rows = [
+    ["Median", M.B.median, M.A.median, false, f1, "Half of the "+u+" have less than "+f1(M.A.median)+", half have more. The richest household cannot pull it up."],
+    ["Mean (average)", M.B.mean, M.A.mean, false, f1, "Total income ÷ "+u+". "+(M.A.mean>M.A.median*1.2?"It is well above the median because one household is very rich.":"Close to the median: no extreme incomes.")],
+    ["Poverty line ("+(S.line)+")", z.b, z.a, null, f1, S.line==="relative" ? S.relPct+"% of the median. It moves when the median moves." : S.line==="anchored" ? S.relPct+"% of the median before the change, kept fixed." : "The cost of a basket of basic needs. It does not move with the median."],
+    ["Poverty rate", p.b.rate, p.a.rate, true, pct, f1(p.a.count)+" of "+f1(W)+" "+u+" are below the line."],
+    ["Poverty gap (sum of shortfalls)", p.b.gap, p.a.gap, true, f1, "The amount needed to lift everyone below the line exactly up to it, if money could be perfectly targeted."],
+    ["Gap index (% of the line)", p.b.index, p.a.index, true, pct, "The gap ÷ (line × all "+f1(W)+" "+u+"). Lets you compare depth across societies of different size and income."],
+    ["S80/S20", M.B.s8020, M.A.s8020, true, f1, "The richest 20% have "+f1(M.A.s8020)+" times the income of the poorest 20%."],
+    ["Palma ratio", M.B.palma, M.A.palma, true, f1, "The richest 10% have "+f1(M.A.palma)+" times the income of the poorest 40% together."],
+    ["Gini", M.B.gini, M.A.gini, true, f2, "0 = everyone has the same, 1 = one has everything. It looks at the whole distribution at once."]
+  ];
+  $("nums").innerHTML = '<thead><tr><th>Indicator</th><th class="n">Before</th><th class="n">After</th><th class="n">Change</th><th>In plain words (after)</th></tr></thead><tbody>' +
+    rows.map(r => '<tr><td class="ni"><b>'+r[0]+'</b></td><td class="n" data-l="Before">'+r[4](r[1])+'</td><td class="n" data-l="After">'+r[4](r[2])+'</td><td class="n nc" data-l="Change">'+(r[3]===null? chg(r[1],r[2],false,r[4]).replace(/class="(up|down)"/,'class="flat"') : r[4]===pct ? chg(r[1]*100,r[2]*100,r[3],v=>f1(v)+" pts") : chg(r[1],r[2],r[3],r[4]))+'</td><td class="m">'+esc(r[5])+'</td></tr>').join("") + '</tbody>';
+  $("numsCap").textContent = "Poverty rows use the " + LINE_NAME[S.line] + ", counting " + u + ". Change the line or the unit in the controls.";
+}
+
+function lorenzSvg(M){
+  const s = 260, L = 50, T = 14, out = [];
+  const X = v => L + v*s, Y = v => T + s - v*s;
+  [0,.2,.4,.6,.8,1].forEach(v => {
+    out.push('<line x1="'+X(v)+'" x2="'+X(v)+'" y1="'+Y(0)+'" y2="'+Y(1)+'" stroke="var(--line)"/>');
+    out.push('<line x1="'+X(0)+'" x2="'+X(1)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/>');
+    out.push('<text x="'+X(v)+'" y="'+(Y(0)+16)+'" text-anchor="middle" font-size="10.5" fill="var(--ink-2)">'+Math.round(v*100)+'%</text>');
+    out.push('<text x="'+(X(0)-6)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="10.5" fill="var(--ink-2)">'+Math.round(v*100)+'%</text>');
+  });
+  const la = lorenz(M.A.P), lb = lorenz(M.B.P);
+  const path = pts => pts.map((p,k)=>(k?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" ");
+  out.push('<path d="'+path(la)+' L'+X(1)+' '+Y(1)+' L'+X(0)+' '+Y(0)+' Z" fill="var(--navy)" opacity=".12"/>');
+  out.push('<line x1="'+X(0)+'" y1="'+Y(0)+'" x2="'+X(1)+'" y2="'+Y(1)+'" stroke="var(--ink-2)" stroke-dasharray="4 3"/>');
+  out.push('<path d="'+path(lb)+'" fill="none" stroke="var(--ghost)" stroke-width="2.5"/>');
+  out.push('<path d="'+path(la)+'" fill="none" stroke="var(--navy)" stroke-width="2.5"/>');
+  la.forEach(p => out.push('<circle cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="2.6" fill="var(--navy)"/>'));
+  out.push('<text x="'+X(.5)+'" y="'+(Y(0)+32)+'" text-anchor="middle" font-size="11" fill="var(--ink-2)">share of '+unitWord()+', poorest first</text>');
+  out.push('<text transform="translate(14 '+Y(.5)+') rotate(-90)" text-anchor="middle" font-size="11" fill="var(--ink-2)">share of all income</text>');
+  out.push('<text x="'+X(.04)+'" y="'+Y(.9)+'" font-size="12" fill="var(--ink)" font-weight="600">Gini '+f2(M.B.gini)+' → '+f2(M.A.gini)+'</text>');
+  out.push('<text x="'+X(.62)+'" y="'+Y(.72)+'" font-size="10.5" fill="var(--ink-2)" transform="rotate(-45 '+X(.62)+' '+Y(.72)+')">perfect equality</text>');
+  $("lorenz").innerHTML = out.join("");
+}
+
+function hhTable(M){
+  const tb = $("hh"), active = document.activeElement && document.activeElement.closest && document.activeElement.closest("#hh") ? document.activeElement.id : null;
+  const z = M.lines[S.line];
+  tb.innerHTML = '<thead><tr><th>#</th><th>Household</th><th class="n">Adults</th><th class="n">Children</th><th>Pensioner</th><th class="n">Before</th><th class="n">Benefit</th><th class="n">After</th><th>Status</th><th></th></tr></thead><tbody>' +
+    M.hh.map((h,i) => {
+      const wp = M.before[i] < z.b - 1e-9, np = M.after[i] < z.a - 1e-9;
+      const st = np ? '<span class="pill poor">poor</span>' : '<span class="pill">not poor</span>';
+      return '<tr><td class="n hn">'+(i+1)+'</td>' +
+      '<td class="lbl" data-l="Household '+(i+1)+'"><input type="text" id="lb'+i+'" data-i="'+i+'" data-f="label" value="'+esc(h.label)+'" aria-label="Household '+(i+1)+' description"></td>' +
+      '<td class="n" data-l="Adults"><input type="number" id="ad'+i+'" data-i="'+i+'" data-f="adults" min="1" max="10" step="1" value="'+h.adults+'" aria-label="Adults in household '+(i+1)+'"></td>' +
+      '<td class="n" data-l="Children"><input type="number" id="ch'+i+'" data-i="'+i+'" data-f="children" min="0" max="10" step="1" value="'+h.children+'" aria-label="Children in household '+(i+1)+'"></td>' +
+      '<td data-l="Pensioner"><input type="checkbox" id="pn'+i+'" data-i="'+i+'" data-f="pensioner"'+(h.pensioner?" checked":"")+' aria-label="Household '+(i+1)+' is a pensioner household"></td>' +
+      '<td class="n" data-l="Before"><input type="text" inputmode="decimal" class="numtxt" id="in'+i+'" data-i="'+i+'" data-f="income" value="'+h.income+'" aria-label="Income before, household '+(i+1)+'"></td>' +
+      '<td class="n" data-l="Benefit">'+(M.ben[i]?"+"+f1(M.ben[i]):"—")+'</td>' +
+      '<td class="n" data-l="After"><b>'+f1(M.after[i])+'</b></td><td class="hs">'+st+(wp!==np?' <span class="hint">('+(np?"new":"left")+')</span>':'')+'</td>' +
+      '<td class="hx">'+(M.hh.length>3?'<button type="button" class="x" data-del="'+i+'" aria-label="Remove household '+(i+1)+'">×</button>':'')+'</td></tr>';
+    }).join("") + '</tbody>';
+  if (active && $(active)) { const el = $(active); el.focus(); if (el.type==="text"||el.type==="number") { try{ const v=el.value; el.value=""; el.value=v; }catch(e){} } }
+}
+
+function eqCalc(){
+  const inc = Math.max(0, num($("eqInc").value)), ad = Math.max(1, Math.round(num($("eqAd").value))||1), ch = Math.max(0, Math.round(num($("eqCh").value)));
+  const o = 1 + 0.5*(ad-1) + 0.3*ch, sq = Math.sqrt(ad+ch), n = ad+ch;
+  const fm = v => Math.round(v).toLocaleString("en-GB");
+  $("eqOut").innerHTML = '<thead><tr><th>Scale</th><th class="n">Equiv. adults</th><th class="n">Per equiv. adult</th></tr></thead><tbody>' +
+    '<tr><td>OECD-modified<br><span class="hint">1 + 0.5 per other adult + 0.3 per child</span></td><td class="n">'+f2(o)+'</td><td class="n">'+fm(inc/o)+'</td></tr>' +
+    '<tr><td>Square root<br><span class="hint">√ household size</span></td><td class="n">'+f2(sq)+'</td><td class="n">'+fm(inc/sq)+'</td></tr>' +
+    '<tr><td>Per person (no sharing)</td><td class="n">'+n+'</td><td class="n">'+fm(inc/n)+'</td></tr></tbody>';
+}
+
+function render(){
+  renderControls();
+  const M = model();
+  chart(M); tiles(M); heads(M); lines3(M); nums(M); lorenzSvg(M); hhTable(M);
+}
+
+/* ---------- events ---------- */
+$("presets").innerHTML = PRESETS.map(p => '<button type="button" class="btn" data-id="'+p.id+'">'+esc(p.name)+'</button>').join("");
+$("presets").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; const p = PRESETS.find(p=>p.id===b.dataset.id); Object.assign(S, p.set); S.preset = p.id; render(); });
+const custom = () => { S.preset = null; };
+$("benAmt").addEventListener("input", e => { S.amt = +e.target.value; custom(); render(); });
+$("benTarget").addEventListener("change", e => { S.target = e.target.value; custom(); render(); });
+["earn","pens","top"].forEach(k => $(k).addEventListener("input", e => { S[k] = +e.target.value; custom(); render(); }));
+$("relPct").addEventListener("input", e => { S.relPct = +e.target.value; render(); });
+$("absLine").addEventListener("input", e => { S.absLine = +e.target.value; render(); });
+$("lineSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b){ S.line = b.dataset.v; render(); } });
+$("unitSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b){ S.unit = b.dataset.v; render(); } });
+$("hh").addEventListener("change", e => {
+  const t = e.target, i = +t.dataset.i, f = t.dataset.f; if (!f) return;
+  if (f === "pensioner") S.hh[i].pensioner = t.checked;
+  else if (f === "label") S.hh[i].label = t.value || ("Household " + (i+1));
+  else { let v = Math.max(f==="adults"?1:0, num(t.value)); if (f!=="income") v = Math.min(10, Math.round(v)); S.hh[i][f] = v; }
+  render();
+});
+$("hh").addEventListener("click", e => { const b = e.target.closest("[data-del]"); if (b){ S.hh.splice(+b.dataset.del, 1); render(); } });
+$("addHh").addEventListener("click", () => { S.hh.push({label:"New household", adults:1, children:0, pensioner:false, income:30}); render(); });
+$("resetHh").addEventListener("click", () => { S.hh = clone(BASE); render(); });
+["eqInc","eqAd","eqCh"].forEach(id => $(id).addEventListener("input", eqCalc));
+
+eqCalc(); render();
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => chart(model()), 120); });
+window.__toy = {S, model, describe, poverty};
+})();
+</script>
+</body></html>
