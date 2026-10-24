@@ -346,9 +346,11 @@ const BOSS = [
   why:"Revenue not collected is a cost. Titmuss called it fiscal welfare; budget documents call it a tax expenditure."}
 ];
 const TOY = [10,14,18,22,26,30,36,44,60,140];
-/* Hand-in: the teacher's Google Form pre-filled link, with the code field set to TEST. Empty = Classroom copy-paste only. */
-const FORM_PREFILL = "";
-const formLink = code => FORM_PREFILL ? FORM_PREFILL.replace(/=TEST(&|$)/, "="+encodeURIComponent(code)+"$1") : "";
+/* Hand-in: the teacher's Google Form. With a pre-filled link (code field set to TEST) the code arrives filled in;
+   without it, the button copies the code and opens the form for the student to paste. */
+const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSde8t2ae95EnmYF45fST5A1t8ButtBfRV7UvUHi82-fKMXIrQ/viewform";
+const FORM_PREFILL = "https://docs.google.com/forms/d/1ey9hcJ43kFiA5UE-rTmUyaImGqO-Oyi84DnTWr8y8Mw/viewform?usp=pp_url&entry.169363539=TEST";
+const formLink = code => FORM_PREFILL ? FORM_PREFILL.replace(/=TEST(&|$)/, "="+encodeURIComponent(code)+"$1") : FORM_URL;
 const CONF = [
   {k:"sure",  t:"Sure",     s:"+5 if all right, −5 if any part is wrong"},
   {k:"think", t:"I think so", s:"no bonus, no risk"},
@@ -623,12 +625,12 @@ function end(){
   <section class="panel">
     <h2>Hand in</h2>
     ${FORM_PREFILL
-      ? `<p>Press <b>Send to your teacher</b>. A Google Form opens with your code already filled in: sign in with your university account if asked, then press <b>Submit</b>. Deadline: Wednesday 28 October, 23:59. You may play again and send again; your teacher counts your best attempt.</p>
-         <div class="actions" style="justify-content:flex-start"><a class="btn" id="send" href="${esc(formLink(code))}" target="_blank" rel="noopener" style="text-decoration:none">Send to your teacher ↗</a></div>
-         <p class="small muted">If the form does not open, copy the code below and paste it into the form or the Session 5 post in Classroom.</p>`
-      : `<p>Copy the code below and paste it into the Session 5 assignment in Classroom, then press <b>Turn in</b>. Deadline: Wednesday 28 October, 23:59. You may play again; your teacher counts your best attempt.</p>`}
+      ? `<p>Press <b>Send to your teacher</b>. A Google Form opens with your code already filled in. Add your university email if asked, then press <b>Submit</b>.</p>`
+      : `<p>Press <b>Send to your teacher</b>. Your code is copied and a Google Form opens. Paste the code into <b>Result code</b> (Ctrl+V, or long-press and Paste on a phone), add your university email and press <b>Submit</b>.</p>`}
+    <div class="actions" style="justify-content:flex-start"><a class="btn" id="send" href="${esc(formLink(code))}" target="_blank" rel="noopener" style="text-decoration:none">Send to your teacher ↗</a></div>
+    <p class="small muted">Deadline: Wednesday 28 October, 23:59. You may play again and send again; your teacher counts your best attempt. If the form does not open, copy the code below and send it the same way later.</p>
     <div class="code" id="code">${code}</div>
-    <div class="actions"><button class="btn ghost" id="again">Play again</button><button class="btn ${FORM_PREFILL?"ghost":""}" id="copy">Copy code</button></div>
+    <div class="actions"><button class="btn ghost" id="again">Play again</button><button class="btn ghost" id="copy">Copy code</button></div>
     <p class="sotd">Predistribution changes what the market pays; redistribution changes what people keep. Every instrument has a cell, a mechanism and a payer, and some payers never appear in the budget.</p>
   </section>`;
 }
@@ -680,6 +682,7 @@ function bind(){
   };
   if ($("abroad")) $("abroad").onclick = () => { S.screen="card"; S.i=S.nHome; render(); };
   if ($("finish")) $("finish").onclick = () => { S.screen="end"; render(); };
+  if ($("send")) $("send").addEventListener("click", () => { if (!FORM_PREFILL) { try { navigator.clipboard.writeText($("code").textContent); } catch(e){} } });
   if ($("copy")) $("copy").onclick = async () => {
     const t = $("code").textContent;
     try { await navigator.clipboard.writeText(t); $("copy").textContent = "Copied"; }
