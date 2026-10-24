@@ -158,7 +158,7 @@ const ABROAD = {
    theme links cards that do the same job in different countries (used for the comparison prompt). */
 const CARDS = [
  {id:"PL1",short:"800+",c:"PL",theme:"child",title:"Family 800+",
-  desc:"PLN 800 a month for every child under 18, with no income test (since 2019; PLN 500 from 2016, PLN 800 since January 2024). Paid by ZUS.",
+  desc:"Since January 2024, PLN 800 a month for every child under 18, with no income test. It began in 2016 as PLN 500 and has covered every child since 2019. Paid by ZUS.",
   facts:["State budget spending in 2024: PLN 66.2 billion"],
   col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["budget"]},
   why:"A cash transfer paid after market incomes are earned: post-production, so redistribution. Because it is universal it reaches the bottom and the middle; Rodrik & Stantcheva list family and child benefits in the bottom row. It is paid from the state budget, that is, by taxpayers, and in deficit years partly by borrowing.",
@@ -170,10 +170,10 @@ const CARDS = [
   why:"It changes what the market pays, during production: predistribution. It aims at the bottom of the wage scale. The budget pays nothing: employers pay higher wages, customers may pay higher prices, and if some jobs are not created, the would-be workers pay. A cost can be real without appearing in the budget.",
   hint:{col:{post:"The money never passes through the state: the employer pays it as a wage.",pre:"It does not change workers' skills; it changes what firms must pay them."},pay:{budget:"Look at who writes the cheque: the employer, not the state."}}},
  {id:"PL3",short:"PL schooling",c:"PL",theme:"school",title:"Compulsory schooling to 18, free public schools",
-  desc:"Poland's Constitution (Art. 70) makes education compulsory until age 18 and education in public schools free of charge. Schools are run by local governments, financed largely by a central education subsidy.",
+  desc:"Poland's Constitution (Art. 70) makes education compulsory until age 18 and education in public schools free of charge.",
   facts:[],
   col:{full:["pre"]}, row:{full:["bottom"],half:["middle"]}, pay:{full:["budget"]},
-  why:"It builds the skills people bring to the market: pre-production, so predistribution. Rodrik & Stantcheva put primary and lower-secondary schooling in the bottom row, because for poor families it is the main source of skills they could not buy. It is paid by taxpayers: predistribution still needs tax money.",
+  why:"It builds the skills people bring to the market: pre-production, so predistribution. Rodrik & Stantcheva put primary and lower-secondary schooling in the bottom row, because for poor families it is the main source of skills they could not buy. Schools are run by local governments and financed largely by a central education subsidy, so taxpayers pay: predistribution still needs tax money.",
   hint:{col:{post:"Nobody receives cash; the policy changes skills before people earn anything.",prod:"Schooling happens before the labour market, not inside firms."},row:{middle:"Everyone attends, but the gain is largest for children whose parents could not pay for schooling: the bottom row."}}},
  {id:"PL4",short:"PL child relief",c:"PL",theme:"relief",title:"Child tax relief (ulga na dzieci)",
   desc:"Parents deduct a fixed amount from their personal income tax: PLN 1,112.04 a year for each of the first two children, more for the third and later children. Only families who pay enough tax and social contributions get the full value.",
@@ -194,13 +194,13 @@ const CARDS = [
   why:"Inheritance shapes the wealth people bring to the market, so inheritance taxation is pre-production, top row (Rodrik & Stantcheva's bottom-left cell). An exemption means the cell is almost empty in Poland: the heirs pay nothing and the revenue is not collected. Half points for 'the people it targets': that is who would pay an inheritance tax, if there were one.",
   hint:{col:{post:"Inheritance is wealth people start with, an endowment, before they enter the market.",prod:"Firms' decisions are not involved; this is about what families pass on."},row:{bottom:"Large inheritances are concentrated at the top of the wealth distribution."}}},
  {id:"IT1",short:"Assegno unico",c:"IT",theme:"child",title:"Universal child allowance (assegno unico universale)",
-  desc:"Since March 2022 families get a monthly allowance for each child from birth to 21 (after 18 only under conditions such as being in school or training). The amount falls as the household's ISEE means indicator rises: in 2026, €203.80 per child under 18 at the lowest ISEE (up to €17,468.51) and €58.30 at the highest (above €46,582.71) or if no ISEE is filed. Paid by INPS.",
-  facts:["Legislative Decree 230/2021; 2026 amounts from INPS circular 7/2026"],
+  desc:"Since March 2022 families get a monthly allowance for each child up to 21 (after 18 only if in school, training or similar). The amount falls as the household's means indicator (ISEE) rises: in 2026, from €203.80 per child under 18 at the lowest ISEE to €58.30 at the highest, or if no ISEE is filed. Paid by INPS.",
+  facts:["Highest amount up to an ISEE of €17,468.51; lowest above €46,582.71 (INPS circular 7/2026)"],
   col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["budget"]},
   why:"Cash after market incomes are earned: post-production, so redistribution. Every family gets it, but a low-ISEE family gets three and a half times as much per child, so it reaches the bottom and the middle: universal, but graded by means. It is paid from the state budget through INPS; nobody needs a contribution record to receive it.",
   hint:{col:{pre:"Cash for families does not change the skills or wealth parents bring to the market.",prod:"Firms play no part; the state pays after incomes are earned."},pay:{contrib:"INPS pays it, but it is not insurance: no contributions are needed to receive it."},row:{top:"The richest families get the minimum amount; the money is weighted towards low and middle incomes."}}},
  {id:"IT2",short:"Assegno di inclusione",c:"IT",theme:"assist",title:"Inclusion allowance (assegno di inclusione)",
-  desc:"Italy's minimum income since 2024, replacing the citizens' income (reddito di cittadinanza). Only households with a child, a person with a disability, a member aged 60 or over, or someone in a care programme can apply, with an ISEE of at most €10,140. Up to €6,500 a year, multiplied by an equivalence scale, plus up to €3,640 a year for renters.",
+  desc:"Italy's minimum income since 2024, replacing the citizens' income (reddito di cittadinanza). Only households with a child, a person with a disability, a member aged 60 or over, or someone in a care programme qualify, and their means indicator (ISEE) must be at most €10,140. Up to €6,500 a year, scaled by household size, plus up to €3,640 for renters.",
   facts:["Paid by INPS on an inclusion card"],
   col:{full:["post"]}, row:{full:["bottom"]}, pay:{full:["budget"]},
   why:"A means-tested top-up after incomes are earned: post-production, bottom row, like China's Dibao and France's RSA in Rodrik & Stantcheva. Taxpayers pay through the budget. Notice the gate: poor adults of working age with no children, disability or care needs cannot apply. Who is left out is a design choice, the topic of Session 6.",
@@ -209,7 +209,7 @@ const CARDS = [
   desc:"Italy has no statutory minimum wage. Minimum pay is set in national sectoral collective agreements (CCNL): about 1,000 of them, covering close to 100% of employees (CNEL, 2025). Courts use the agreement's wage as the benchmark for the 'fair pay' guaranteed by Article 36 of the Constitution.",
   facts:["Many agreements are renewed late: CNEL counted 62% past their expiry date"],
   col:{full:["prod"]}, row:{full:["bottom"],half:["middle"]}, pay:{full:["employers"]},
-  why:"Collective agreements change what the market pays: production stage, predistribution. The floors protect the bottom of each sector's pay scale, and the scales also set middle wages (half points). Employers and their customers pay, as with a statutory minimum wage, but the floor is set by unions and employers, not by the government: bargaining power, a Session 3 mechanism. The weak spot is time: an agreement that is renewed late lets the floor fall behind prices.",
+  why:"Agreements change what the market pays: production stage, predistribution. Rodrik & Stantcheva list 'minimum wage set under collective bargaining' in the bottom row; the same scales also set middle wages (half points). Employers and their customers pay. The floor is set by unions and employers, not the government: bargaining power, a Session 3 mechanism. Its weak spot: an agreement renewed late lets the floor fall behind prices.",
   hint:{col:{post:"No money passes through the state: employers pay the agreed wages.",pre:"It does not change workers' skills; it changes what firms must pay them."},pay:{budget:"The state pays nothing here; employers pay the agreed wages."}}},
  {id:"IT4",short:"IT tax cut 35→33",c:"IT",theme:"relief",title:"Income tax cut for the middle (2026)",
   desc:"Italy's 2026 budget law (Law 199/2025) cut the personal income tax (IRPEF) rate on income between €28,000 and €50,000 from 35% to 33%. The other two rates stay: 23% up to €28,000 and 43% above €50,000.",
@@ -217,8 +217,8 @@ const CARDS = [
   col:{full:["post"]}, row:{full:["middle"],half:["top"]}, pay:{full:["foregone"],half:["budget"]},
   why:"A change in the tax people pay after income is earned: post-production. The gain starts at €28,000 and stops growing at €50,000, so the middle is the target; people above €50,000 also get the full €440 (half points for the top). Who pays? Nobody gets a bill: it is revenue the state stops collecting, made up by other taxes, spending cuts or borrowing (half points for the budget).",
   hint:{row:{bottom:"Below €28,000 a year nothing changes."},pay:{targets:"The people it targets gain from it; they do not pay for it."}}},
- {id:"IT5",short:"IT pension contrib.",c:"IT",theme:"pension",title:"Pension contributions: 33% of gross pay",
-  desc:"Employees in Italy's main pension fund (FPLD, run by INPS) pay 33% of gross pay into it: 9.19% is deducted from the wage and 23.81% is paid by the employer. Pensions are paid from the fund.",
+ {id:"IT5",short:"IT pension contrib.",c:"IT",theme:"pension",title:"Public pensions paid from contributions",
+  desc:"Italy's main public pension fund (FPLD, run by INPS) pays pensions to former employees. It collects 33% of gross pay: 9.19% is deducted from the wage and 23.81% is paid by the employer.",
   facts:["Rates confirmed in INPS circular 27/2025"],
   col:{full:["post"]}, row:{full:["middle"],half:["bottom"]}, pay:{full:["contrib"],half:["employers"]},
   why:"Social insurance moves income from working years to old age after wages are earned: post-production. Pensions follow past earnings, so they protect mainly the middle; the bottom gains too, but less (half points). Who pays: contributions, the insurance layer. Half points for employers: they write the cheque for 23.81%, but whether the firm or the worker (through lower wages) really bears it is a classic question of tax incidence.",
@@ -230,7 +230,7 @@ const CARDS = [
   why:"Inheritance is wealth people bring to the market: pre-production, top row (Rodrik & Stantcheva's inheritance cell). The heirs pay, but with €1 million exempt per heir, most estates pay nothing (half points for revenue not collected). Compare: Poland exempts close family completely; Flanders charges children up to 27%.",
   hint:{col:{post:"Inheritance is wealth people start with, an endowment, before they enter the market.",prod:"Firms' decisions are not involved; this is about what families pass on."},row:{middle:"With €1 million exempt per heir, middle-class heirs pay nothing."}}},
  {id:"BE1",short:"Groeipakket",c:"BE",theme:"child",title:"Growth Package (Groeipakket), Flanders",
-  desc:"In Flanders every child born since 2019 gets a basic €190.66 a month (from September 2026) whatever the parents earn, plus a social supplement for lower-income families: for example €76.09 per child for one or two children if household income is below €42,020. Since 2019 family benefits belong to the communities; Wallonia, Brussels and the German-speaking Community run their own systems.",
+  desc:"In Flanders every child born since 2019 gets €190.66 a month (from September 2026), whatever the parents earn. Lower-income families get a social supplement on top: for example €76.09 per child for one or two children if household income is below €42,020. Wallonia, Brussels and the German-speaking Community run their own systems.",
   facts:[],
   col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["budget"]},
   why:"A universal base plus a means-tested top-up: post-production, reaching the bottom (the supplement) and the middle (the base). Paid from the Flemish budget, that is, by taxpayers. Same cell as Poland's 800+ and Italy's assegno unico; the design inside the cell differs, which is the topic of Session 6.",
@@ -256,27 +256,27 @@ const CARDS = [
  {id:"BE5",short:"BE securities tax",c:"BE",theme:"toptax",title:"Tax on securities accounts",
   desc:"Since 2021 Belgium charges 0.15% a year on securities accounts (shares, bonds, funds) whose average value is above €1 million (Law of 17 February 2021).",
   facts:[],
-  col:{full:["post"],half:["pre"]}, row:{full:["top"]}, pay:{full:["targets"]},
-  why:"A yearly tax on wealth already held: Rodrik & Stantcheva put wealth taxes in the top row of the post-production column, next to top income tax rates. Half points for pre-production: wealth is an endowment, though this tax is collected every year rather than when wealth passes to the next generation. The account holders pay. A low rate on a narrow base: the top row usually holds few instruments.",
-  hint:{col:{prod:"It does not change how firms pay or compete; it taxes wealth people hold."},row:{middle:"Below €1 million nothing is due."}}},
+  col:{full:["post"]}, row:{full:["top"]}, pay:{full:["targets"]},
+  why:"A yearly tax on wealth already held: Rodrik & Stantcheva put wealth taxes in the top row of the post-production column, next to top income tax rates. The account holders pay. A low rate on a narrow base: the top row usually holds few instruments.",
+  hint:{col:{prod:"It does not change how firms pay or compete; it taxes wealth people hold.",pre:"Taxes on wealth passed on at death or as gifts are pre-production (endowments). A yearly tax on wealth people already hold is post-production, like a top income tax."},row:{middle:"Below €1 million nothing is due."}}},
  {id:"BE6",short:"BE inheritance",c:"BE",theme:"inherit",title:"Inheritance tax, Flanders",
-  desc:"In Flanders children and spouses pay inheritance tax on their own share at 3% up to €50,000, 9% from €50,000 to €250,000 and 27% above. The rates are set by the regions; Brussels and Wallonia have their own scales.",
+  desc:"In Flanders children pay inheritance tax on their own share at 3% up to €50,000, 9% from €50,000 to €250,000 and 27% above. The rates are set by the regions; Brussels and Wallonia have their own scales.",
   facts:[],
   col:{full:["pre"]}, row:{full:["top"],half:["middle"]}, pay:{full:["targets"]},
   why:"Inheritance is wealth people bring to the market: pre-production, top row, paid by the heirs. With rates starting at 3%, middle-class heirs pay too (half points for middle). One cell, three very different fillings: 0% for close family in Poland, 4% above €1 million in Italy, up to 27% in Flanders.",
   hint:{col:{post:"Inheritance is wealth people start with, an endowment, before they enter the market.",prod:"Firms' decisions are not involved; this is about what families pass on."},pay:{foregone:"Here the tax is actually collected: the heirs pay."}}},
  {id:"CN1",short:"Dibao",c:"CN",theme:"assist",title:"Dibao (minimum living guarantee)",
   desc:"China's means-tested cash assistance: households whose income per person is below a local line receive a top-up. About 40 million people received it in 2022, under 3% of the population.",
-  facts:["Financed jointly by central and local governments"],
+  facts:[],
   col:{full:["post"]}, row:{full:["bottom"]}, pay:{full:["budget"]},
   why:"A means-tested transfer after incomes are earned: post-production, bottom row (like France's RSA in Rodrik & Stantcheva). It is paid from central and local budgets, that is, by taxpayers.",
   hint:{col:{prod:"It does not change wages; it tops up income afterwards.",pre:"It pays cash now; it does not build skills or assets."},row:{middle:"A means test keeps it at the very bottom."}}},
  {id:"CN2",short:"CN childcare",c:"CN",theme:"child",title:"National childcare subsidy (2025)",
   desc:"RMB 3,600 a year for each child under three, for children born from 1 January 2025 (earlier-born children under three get a proportional amount). No income test.",
-  facts:["Central government pays about 90%; about RMB 90 billion in 2025"],
-  col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["budget"]},
-  why:"Cash paid to families after incomes are earned: post-production. Universal, so bottom and middle, like 800+. Paid from the budget, mostly the central one. It is called a childcare subsidy, but it is cash, not childcare places: the name does not decide the cell.",
-  hint:{col:{pre:"Childcare places would build children's capabilities; this is a cash payment to parents."}}},
+  facts:[],
+  col:{full:["post"],half:["pre"]}, row:{full:["bottom","middle"]}, pay:{full:["budget"]},
+  why:"Cash paid to families after incomes are earned: post-production. Universal, so bottom and middle, like 800+. Paid from the budget, about 90% by the central government (about RMB 90 billion in 2025). Half points for pre-production: Rodrik & Stantcheva list childcare subsidies there, but they mean help to pay for childcare places. This is cash with no condition on using childcare: the name does not decide the cell.",
+  hint:{}},
  {id:"CN3",short:"CN antitrust",c:"CN",theme:"antitrust",title:"Anti-monopoly fine on a platform giant",
   desc:"In April 2021 China's market regulator fined Alibaba RMB 18.2 billion for abusing its dominant position, forcing merchants to sell only on its platform.",
   facts:[],
@@ -296,10 +296,10 @@ const CARDS = [
   why:"A tax on income after it is earned: post-production. With RMB 60,000 a year deducted, many workers pay nothing, and the rates rise steeply at the top: the cell where Rodrik & Stantcheva put progressive income taxation. Who pays: the higher earners themselves. Half points for middle: urban middle earners above the deduction pay the lower rates.",
   hint:{col:{prod:"It does not change what employers pay; it takes a share afterwards."},pay:{foregone:"The deduction is a relief, but the instrument as a whole is a tax collected from earners."}}},
  {id:"CN6",short:"CN free preschool",c:"CN",theme:"school",title:"Free final year of preschool",
-  desc:"From autumn 2025 public kindergartens in China no longer charge care and education fees for children in their last preschool year (meals and boarding are still paid). Private kindergartens cut their fees by the same amount, and the government covers the lost income (State Council General Office guideline, August 2025).",
+  desc:"From autumn 2025 public kindergartens in China no longer charge care and education fees for children in their last preschool year (meals and boarding are still paid). Private kindergartens cut their fees by the same amount (State Council guideline, August 2025).",
   facts:[],
   col:{full:["pre"]}, row:{full:["bottom"],half:["middle"]}, pay:{full:["budget"]},
-  why:"Early education builds skills before people reach the market: pre-production, predistribution. Every child is covered, but the fee waiver matters most to families who could not otherwise pay: bottom row (half points for middle). Paid by taxpayers through government budgets. Compare Belgium, which pursued the same goal by making school compulsory from age 5.",
+  why:"Early education builds skills before people reach the market: pre-production, predistribution. Every child is covered, but the fee waiver matters most to families who could not otherwise pay: bottom row (half points for middle). The government covers the kindergartens' lost fees, so taxpayers pay through the budget. Compare Belgium, which pursued the same goal by making school compulsory from age 5.",
   hint:{col:{post:"Families do not receive cash; the policy builds children's skills before they reach the market.",prod:"Kindergarten comes long before the labour market."},row:{middle:"Everyone is covered, but the fee waiver matters most to families who could not otherwise pay."}}},
  {id:"MN1",short:"MN child money",c:"MN",theme:"child",title:"Child Money Programme",
   desc:"Mongolia pays MNT 100,000 a month for every child. In early 2023 it was targeted at 91% of children; universal coverage was restored in July 2023.",
@@ -320,33 +320,33 @@ const CARDS = [
   why:"A tax on earned income: post-production. The higher rates fall on the top, the cell where Rodrik & Stantcheva put progressive income taxation. Who pays: higher earners. Half points for middle: every wage earner pays the 10% base rate.",
   hint:{col:{prod:"It does not change what employers pay; it takes a share afterwards."}}},
  {id:"MN4",short:"MN school lunch",c:"MN",theme:"school",title:"Free school lunch, grades 1–5",
-  desc:"Mongolia gives a free lunch at school to primary pupils in grades 1–5: about 382,000 children in 2022/23, paid entirely from the government budget. A school snack programme ran from 2006; lunches replaced it from 2021.",
+  desc:"Mongolia gives a free lunch at school to primary pupils in grades 1–5: about 382,000 children in 2022/23. A school snack programme started in 2006; lunches were introduced in 2021.",
   facts:["Global Child Nutrition Foundation, country survey 2024"],
   col:{full:["pre"],half:["post"]}, row:{full:["bottom"],half:["middle"]}, pay:{full:["budget"]},
-  why:"Food at school supports children's health and learning, the endowments they bring to the market later: pre-production. Half points for post-production: it is also an in-kind transfer to families today. Every pupil eats, but a free meal matters most to poor families: bottom row (half points for middle). Paid by taxpayers through the budget.",
+  why:"Food at school supports children's health and learning, the endowments they bring to the market later: pre-production. Half points for post-production: it is also an in-kind transfer to families today. Every pupil eats, but a free meal matters most to poor families: bottom row (half points for middle). The survey reports the government budget as the only funder: taxpayers pay.",
   hint:{col:{prod:"Firms play no part; this is about children's health and learning."},pay:{mining:"The survey reports the government budget as the only funder."}}},
- {id:"MN5",short:"MN pension contrib.",c:"MN",theme:"pension",title:"Pension insurance contributions",
-  desc:"Mongolian employees pay 8.5% of their wage into pension insurance and employers add another 8.5%. With health, benefit and unemployment insurance, employees pay 11.5% in total and employers 12.5–14.5%.",
+ {id:"MN5",short:"MN pension contrib.",c:"MN",theme:"pension",title:"Pension insurance paid from contributions",
+  desc:"Mongolia's social insurance pays old-age pensions. For pensions, employees pay 8.5% of their wage and employers another 8.5%. With health, benefit and unemployment insurance, employees pay 11.5% in total and employers 12.5–14.5%.",
   facts:["Rates from PwC Worldwide Tax Summaries, Mongolia"],
   col:{full:["post"]}, row:{full:["middle"],half:["bottom"]}, pay:{full:["contrib"],half:["employers"]},
   why:"Social insurance moves income from working years to old age after wages are earned: post-production. Pensions follow past earnings, so they protect mainly the middle (half points for the bottom). Who pays: contributions. Half points for employers: they pay half, but who really bears it, firm or worker, is a question of tax incidence. Compare Italy: 33% of gross pay for pensions, almost twice Mongolia's 17%.",
   hint:{col:{prod:"The contribution is collected on wages already earned; the pension is paid later.",pre:"It does not change skills or wealth people bring to the market."},pay:{budget:"The fund is filled by contributions, not general taxes."}}},
  {id:"MN6",short:"MN HDF cash",c:"MN",theme:"mining",title:"Human Development Fund: cash for every citizen (2010–2012)",
-  desc:"From 2010 to 2012 every citizen of Mongolia received MNT 21,000 a month from the Human Development Fund, which was fed by mining revenue. In 2012 the fund spent up to 18% of government revenue while its mining income was about half that. After the 2012 election the universal payments stopped; only child money continued.",
+  desc:"From 2010 to 2012 every citizen of Mongolia received MNT 21,000 a month from the Human Development Fund, set up to share the mining boom with citizens. In 2012 the fund paid out up to 18% of government revenue, about twice what its own sources brought in. After the 2012 election the universal payments stopped.",
   facts:["In 2016 the fund's debts of MNT 1.07 trillion were moved to the new Future Heritage Fund"],
   col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["mining"],half:["budget"]},
   why:"A universal cash transfer: post-production, bottom and middle. It was meant to be paid from mining revenue, a payer most countries do not have. When spending outran mining income the fund ran up debts that the state had to take over (half points for the budget). A promise tied to commodity prices is a fragile promise.",
   hint:{col:{pre:"Cash today does not change skills or wealth people bring to the market."},pay:{targets:"Citizens received the money; mining companies' royalties and taxes were meant to pay for it."}}}
 ];
 const BOSS = [
- {claim:"“The minimum wage costs the state nothing, so nobody pays for it.”", ans:false,
-  why:"The budget pays nothing, but employers, customers or people not hired may pay. Off-budget is not free."},
+ {claim:"“A tax relief can cost the state as much as a benefit, yet never appear as spending.”", ans:true,
+  why:"Revenue not collected is a cost. Titmuss called it fiscal welfare; budget documents call it a tax expenditure."},
  {claim:"“A monthly child benefit is predistribution, because it is paid before parents pay their income tax.”", ans:false,
   why:"Predistribution changes what the market pays. A child benefit changes what families keep after the market has paid: redistribution, whatever the timing of the payment."},
- {claim:"“A country that invests enough in free public schools can do without progressive taxes.”", ans:false,
-  why:"Schools need tax money, and parents' own inputs still differ. Haaparanta, Kanbur, Pirttilä, Tuomala and co-authors: “pre-distribution requires redistribution, and redistribution aids pre-distribution.”"},
- {claim:"“A tax relief can cost the state as much as a benefit, yet never appear as spending.”", ans:true,
-  why:"Revenue not collected is a cost. Titmuss called it fiscal welfare; budget documents call it a tax expenditure."}
+ {claim:"“Since the minimum wage is not in the state budget, nobody pays for it.”", ans:false,
+  why:"The budget pays nothing, but employers, customers or people not hired may pay. Off-budget is not free."},
+ {claim:"“Even a country with excellent free public schools still needs progressive taxes and transfers.”", ans:true,
+  why:"Schools need tax money, and parents' own inputs still differ. Haaparanta, Kanbur, Pirttilä, Tuomala and co-authors: “pre-distribution requires redistribution, and redistribution aids pre-distribution.”"}
 ];
 const TOY = [10,14,18,22,26,30,36,44,60,140];
 /* Hand-in: the teacher's Google Form. With a pre-filled link (code field set to TEST) the code arrives filled in;
@@ -532,10 +532,10 @@ function card(){
     const twin = r===1 && S.home!=="MIX" ? S.deck.slice(0,S.nHome).find(h=>h.theme===c.theme) : null;
     const cmp = twin ? `<p class="compare small"><b>Compare with ${esc(COUNTRIES[S.home])}:</b> ${esc(twin.title)} sits in ${esc(cellName(twin))}, paid by ${esc(label(PAYERS,twin.pay.full[0]).toLowerCase())}. Same job, ${sameCell(c,twin)?"same cell. Is the design inside the cell different?":"a different cell. Why might the two countries have chosen differently?"}</p>` : "";
     fb = `<div class="fb">
+      <p><b>Answer:</b> ${esc(cellName(c))}${c.row.full.length>1?" (both rows count)":""}; paid by ${esc(label(PAYERS,c.pay.full[0]).toLowerCase())}. <span class="muted">${c.col.full[0]==="post"?"Redistribution":"Predistribution"}.</span></p>
       ${row("col","When",COLS)}${row("row","Whose income",ROWS)}${row("pay","Who pays",PAYERS)}
       ${perfect?`<div class="fb-row"><span class="mark full">+5</span><span>Perfect card bonus.</span></div>`:""}
       ${confRow}${surprise}
-      ${stripHTML(c.col.full[0])}
       <p class="why">${esc(c.why)}</p>
       ${cmp}
       <div class="actions"><button class="btn" id="next">${nextLabel()}</button></div>
@@ -550,9 +550,9 @@ function card(){
       ${boardHTML({idx:ridx, answering:true, current:S.i, a, c, show})}
       <p class="small muted">${show?"Green: right cell. Amber: half right. The card now sits in its right cell on your board.":"Cards you have already checked sit in their right cells. Tap a cell to place this one."}</p></div>
     <div class="q"><span class="q-title"><span class="n">2</span>Who pays for it?</span>
-      <div class="opts pay">${PAYERS.map(o=>btn("pay",o.k,o.t,a.pay,cls(c.pay,"pay",o.k),o.s)).join("")}</div></div>
+      <div class="opts pay">${PAYERS.map(o=>btn("pay",o.k,o.t,a.pay,cls(c.pay,"pay",o.k),S.i<4?o.s:"")).join("")}</div></div>
     <div class="q"><span class="q-title"><span class="n">3</span>How sure are you?</span>
-      <div class="opts three">${CONF.map(o=>btn("conf",o.k,o.t,a.conf,show&&a.conf===o.k?"sel":"",o.s)).join("")}</div></div>
+      <div class="opts three">${CONF.map(o=>btn("conf",o.k,o.t,a.conf,show&&a.conf===o.k?"sel":"",S.i<2?o.s:"")).join("")}</div></div>
     ${show?fb:`<div class="actions"><button class="btn" id="check" ${allSet?"":"disabled"}>Check</button></div>`}
   </section>`;
 }
@@ -676,6 +676,17 @@ function end(){
       ${badge("Sure and right",calib,75,sure.length?`${sureRight} of ${sure.length} sure cards`:"no card marked sure")}
     </div>
   </section>
+  <section class="panel">
+    <h2>Hand in</h2>
+    ${FORM_PREFILL
+      ? `<p>Press <b>Send to your teacher</b>. A Google Form opens with your code already filled in. Add your university email if asked, then press <b>Submit</b>.</p>`
+      : `<p>Press <b>Send to your teacher</b>. Your code is copied and a Google Form opens. Paste the code into <b>Result code</b> (Ctrl+V, or long-press and Paste on a phone), add your university email and press <b>Submit</b>.</p>`}
+    <div class="actions" style="justify-content:flex-start"><a class="btn" id="send" href="${esc(formLink(code))}" target="_blank" rel="noopener" style="text-decoration:none">Send to your teacher ↗</a></div>
+    <p class="small muted">Deadline: Wednesday 28 October, 23:59. You may play again and send again; your teacher counts your best attempt. If the form does not open, copy the code below and send it the same way later. <b>Your personal debrief is just below.</b></p>
+    <div class="code" id="code">${code}</div>
+    <div class="actions"><button class="btn ghost" id="again">Play again</button><button class="btn ghost" id="copy">Copy code</button></div>
+    <p class="sotd">Predistribution changes what the market pays; redistribution changes what people keep. Every instrument has a cell, a mechanism and a payer, and some payers never appear in the budget.</p>
+  </section>
   ${debrief()}
   <section class="panel">
     <h2>Your files</h2>
@@ -683,17 +694,7 @@ function end(){
     ${boards}
     <p>Bring two questions to Friday: <b>which cells are empty</b>, at home and abroad, and would Rodrik &amp; Stantcheva want them filled? And which of your cases <b>cost something that never appears in the budget</b>?</p>
   </section>
-  <section class="panel">
-    <h2>Hand in</h2>
-    ${FORM_PREFILL
-      ? `<p>Press <b>Send to your teacher</b>. A Google Form opens with your code already filled in. Add your university email if asked, then press <b>Submit</b>.</p>`
-      : `<p>Press <b>Send to your teacher</b>. Your code is copied and a Google Form opens. Paste the code into <b>Result code</b> (Ctrl+V, or long-press and Paste on a phone), add your university email and press <b>Submit</b>.</p>`}
-    <div class="actions" style="justify-content:flex-start"><a class="btn" id="send" href="${esc(formLink(code))}" target="_blank" rel="noopener" style="text-decoration:none">Send to your teacher ↗</a></div>
-    <p class="small muted">Deadline: Wednesday 28 October, 23:59. You may play again and send again; your teacher counts your best attempt. If the form does not open, copy the code below and send it the same way later.</p>
-    <div class="code" id="code">${code}</div>
-    <div class="actions"><button class="btn ghost" id="again">Play again</button><button class="btn ghost" id="copy">Copy code</button></div>
-    <p class="sotd">Predistribution changes what the market pays; redistribution changes what people keep. Every instrument has a cell, a mechanism and a payer, and some payers never appear in the budget.</p>
-  </section>`;
+`;
 }
 
 function makeCode(){
