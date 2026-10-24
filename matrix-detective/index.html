@@ -111,6 +111,9 @@ textarea{min-height:76px;resize:vertical}
 .toy div{flex:1;background:var(--navy);border-radius:3px 3px 0 0;position:relative}
 .toy div.poor{background:var(--bad)}
 .sotd{font-family:var(--serif);font-style:italic;border-left:3px solid var(--navy);padding-left:12px}
+.rev{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:8px}
+.rev th,.rev td{text-align:left;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line)}
+.rev th{font-size:.74rem;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-2)}
 .two-boards{display:grid;grid-template-columns:1fr;gap:18px}
 .hidden{display:none !important}
 .flash{animation:flash .5s}
@@ -593,6 +596,63 @@ function boss(){
   </section>`;
 }
 
+/* A personal debrief: overall level, the weakest decision with a tip, the payer mix-up, cases to revisit. */
+const TIPS = {
+  col:"Ask one question: does the policy change what the market pays (skills and wealth before the market, or firms' pay and prices), or what people keep after the market has paid (taxes and transfers)? The name of a policy does not decide its column; the flow of money does.",
+  row:"Ask whose income the policy matters most for. Universal cash reaches the bottom and the middle; a means test keeps a policy at the bottom; high thresholds and wealth taxes aim at the top.",
+  pay:"Follow the money to its source: general taxes (budget), an insurance fund (contributions), wages and prices (employers and customers), a tax not collected (revenue foregone), the taxed or fined people themselves, or mining revenue."
+};
+function debrief(){
+  const N = S.deck.length, idx = S.deck.map((c,i)=>i);
+  const G = i => { const c=S.deck[i], a=S.ans[i]; return {col:grade(c.col,a.col), row:grade(c.row,a.row), pay:grade(c.pay,a.pay)}; };
+  const perfect = i => Object.values(G(i)).every(x=>x==="full");
+  const share = d => idx.reduce((s,i)=>s+PTS[G(i)[d]],0)/(N*10);
+  const names = {col:"when a policy acts (the column)", row:"whose income it targets (the row)", pay:"who pays"};
+  const dims = ["col","row","pay"].sort((x,y)=>share(x)-share(y));
+  const weak = dims[0], strong = dims[2];
+  const nPerfect = idx.filter(perfect).length;
+  const level = nPerfect>=10 ? "Excellent work: you can already read a policy like an analyst."
+    : nPerfect>=7 ? "Solid work: most of the matrix is in place, and Friday will fix the rest."
+    : nPerfect>=4 ? "A fair start: the matrix is new, and the paper round on Friday is exactly for this."
+    : "The matrix is still new to you. That is fine: re-read pp. 1–6 of the paper with your boards above, and Friday's team round will help.";
+  const lines = [];
+  lines.push(`<p><b>${nPerfect} of ${N}</b> cases fully right. ${level}</p>`);
+  if (share(weak) < share(strong) - 0.05)
+    lines.push(`<p><b>Your strongest decision:</b> ${names[strong]} (${Math.round(100*share(strong))}%). <b>Work on:</b> ${names[weak]} (${Math.round(100*share(weak))}%). ${TIPS[weak]}</p>`);
+  else lines.push(`<p><b>Your three decisions are balanced</b> (${["col","row","pay"].map(d=>Math.round(100*share(d))+"%").join(" · ")} for column, row and payer).</p>`);
+  const mix = {};
+  idx.forEach(i=>{ if (G(i).pay==="wrong"){ const k=S.ans[i].pay+">"+S.deck[i].pay.full[0]; mix[k]=(mix[k]||0)+1; } });
+  const top = Object.entries(mix).sort((a,b)=>b[1]-a[1])[0];
+  if (top){
+    const [said,right] = top[0].split(">");
+    lines.push(`<p><b>Your most frequent payer mix-up:</b> you chose “${esc(label(PAYERS,said).toLowerCase())}” where the answer was “${esc(label(PAYERS,right).toLowerCase())}” (${top[1]}×). Remember: ${esc(PAYERS.find(p=>p.k===right).s)}.</p>`);
+  }
+  const off = idx.filter(i=>["employers","foregone"].includes(S.deck[i].pay.full[0]));
+  if (off.length){
+    const offOK = off.filter(i=>G(i).pay==="full").length;
+    lines.push(`<p><b>Hidden payers:</b> ${off.length} of your cases cost money that never appears as budget spending (employers and customers, or revenue not collected). You named the payer right in ${offOK} of them. ${offOK<off.length?"This is the idea Friday's session is built around.":"Well spotted: this is the idea Friday's session is built around."}</p>`);
+  }
+  if (S.home!=="MIX"){
+    const h = roundIdx(0).filter(perfect).length, ab = roundIdx(1).filter(perfect).length;
+    lines.push(`<p><b>Home and abroad:</b> ${h} of 6 fully right for ${esc(COUNTRIES[S.home])}, ${ab} of 6 abroad. ${h>ab?"Knowing a country helps.":h<ab?"Interesting: the cases from home were not easier. Knowing a policy is not the same as classifying it.":"Knowing the country made no difference to your score."}</p>`);
+  }
+  if (S.warm[0]!==1) lines.push(`<p><b>Warm-up:</b> the relative rate stays at 20% when all incomes fall by 10%. Try it once more in the <a href="https://rszarf-1.github.io/toy-society-poverty-lab/" target="_blank" rel="noopener" style="color:inherit;font-weight:600">Toy Society Lab ↗</a>.</p>`);
+  const sureWrong = idx.filter(i=>S.ans[i].conf==="sure" && Object.values(G(i)).includes("wrong"));
+  const review = idx.filter(i=>!perfect(i));
+  const rows = review.map(i=>{const c=S.deck[i], a=S.ans[i], g=G(i);
+    const mine = `${label(ROWS,a.row).toLowerCase()} · ${label(COLS,a.col).toLowerCase()}; ${label(PAYERS,a.pay).toLowerCase()}`;
+    const right = `${cellName(c)}; ${label(PAYERS,c.pay.full[0]).toLowerCase()}`;
+    return `<tr><td>${sureWrong.includes(i)?"<b>★</b> ":""}${esc(c.short)}</td><td class="muted">${esc(mine)}</td><td>${esc(right)}</td></tr>`;}).join("");
+  return `<section class="panel">
+    <h2>Your debrief</h2>
+    ${lines.join("")}
+    ${sureWrong.length?`<p class="alert small"><b>Revisit first (★):</b> ${sureWrong.map(i=>esc(S.deck[i].short)).join(", ")}. You were sure and part of it was wrong: these are the mistakes worth fixing before Friday.</p>`:""}
+    ${review.length?`<details><summary style="cursor:pointer;font-weight:600">Cases to review (${review.length}): your answer and the right one</summary>
+      <table class="rev"><tr><th>Case</th><th>You</th><th>Right (row · column; payer)</th></tr>${rows}</table>
+      <p class="small muted">Half answers count as defensible; the explanations on each card say why. Play again to see them.</p></details>`:`<p>Every case fully right. Bring your boards to Friday: your team will need you.</p>`}
+  </section>`;
+}
+
 function end(){
   const dims = ["col","row","pay"];
   const N = S.deck.length;
@@ -616,6 +676,7 @@ function end(){
       ${badge("Sure and right",calib,75,sure.length?`${sureRight} of ${sure.length} sure cards`:"no card marked sure")}
     </div>
   </section>
+  ${debrief()}
   <section class="panel">
     <h2>Your files</h2>
     <p class="small muted">Every case in its right cell (rows: whose income; columns: when). Dashed cells are empty.</p>
