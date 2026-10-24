@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Matrix Detective</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap">
+<style>
+/* Course look: navy and pale slate. Version 2: pick a home country, place each case on the board,
+   pick a payer, say how sure you are, get feedback; the card then moves to its right cell. */
+:root{
+  --bg:#F3F5F8; --panel:#FFFFFF; --ink:#14213D; --ink-2:#4A5672; --line:#D5DBE5;
+  --navy:#14213D; --chip:#E7EBF2; --focus:#2E5BBA;
+  --good:#1F7A70; --good-soft:#DCEFEC; --half:#9A6A12; --half-soft:#F5EBD6; --bad:#B23A48; --bad-soft:#F3D9DC;
+  --PL:#B23A48; --CN:#9A6A12; --MN:#2E5BBA; --IT:#6B4FA3; --BE:#2F6B3A;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1526; --panel:#162036; --ink:#E6EAF2; --ink-2:#A3AEC4; --line:#2B3854;
+  --navy:#9DB4E8; --chip:#22304C; --focus:#8FB0F5;
+  --good:#5CC2B4; --good-soft:#173A37; --half:#D9A94A; --half-soft:#3D3220; --bad:#E07A86; --bad-soft:#4A2630;
+  --PL:#E07A86; --CN:#D9A94A; --MN:#8FB0F5; --IT:#B9A2E6; --BE:#8CCB8F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1526; --panel:#162036; --ink:#E6EAF2; --ink-2:#A3AEC4; --line:#2B3854;
+  --navy:#9DB4E8; --chip:#22304C; --focus:#8FB0F5;
+  --good:#5CC2B4; --good-soft:#173A37; --half:#D9A94A; --half-soft:#3D3220; --bad:#E07A86; --bad-soft:#4A2630;
+  --PL:#E07A86; --CN:#D9A94A; --MN:#8FB0F5; --IT:#B9A2E6; --BE:#8CCB8F; color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-left,0px)) 56px;display:grid;gap:16px}
+h1,h2,h3{font-family:var(--serif);margin:0;font-weight:600;text-wrap:balance}
+h1{font-size:clamp(1.8rem,5vw,2.4rem);line-height:1.12}
+h2{font-size:1.35rem;line-height:1.2}
+h3{font-size:1.02rem}
+p{margin:0}
+.eyebrow{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+.muted{color:var(--ink-2)}
+.small{font-size:.86rem}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.score{font-family:var(--mono);font-size:.92rem;background:var(--chip);border-radius:999px;padding:4px 12px}
+.progress{height:6px;background:var(--chip);border-radius:99px;overflow:hidden}
+.progress > i{display:block;height:100%;background:var(--navy);width:0;transition:width .3s}
+.tag{display:inline-block;font-size:.74rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 9px;border-radius:999px;border:1.5px solid currentColor}
+.c-PL{color:var(--PL)} .c-CN{color:var(--CN)} .c-MN{color:var(--MN)} .c-IT{color:var(--IT)} .c-BE{color:var(--BE)}
+.card-desc{font-size:1rem}
+.facts{margin:0;padding-left:18px;display:grid;gap:3px}
+.q{display:grid;gap:8px}
+.q-title{font-weight:600}
+.q-title .n{display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;background:var(--navy);color:var(--panel);font-size:.8rem;margin-right:6px}
+.opts{display:grid;gap:8px}
+.opts.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.opts.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.opts.pay{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:520px){.opts.pay{grid-template-columns:1fr}}
+.opt{font:inherit;text-align:left;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;min-height:44px;display:grid;gap:2px}
+.opt small{color:var(--ink-2);font-size:.8rem;line-height:1.35}
+.opt:hover{border-color:var(--navy)}
+.opt[aria-pressed="true"]{border-color:var(--navy);background:var(--chip);box-shadow:inset 0 0 0 1px var(--navy)}
+.opt.full{border-color:var(--good);background:var(--good-soft)}
+.opt.half{border-color:var(--half);background:var(--half-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.countries{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:520px){.countries{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.countries .opt{text-align:center;font-weight:600}
+.btn{font:inherit;font-weight:600;border:0;border-radius:10px;padding:12px 18px;background:var(--navy);color:var(--panel);cursor:pointer;min-height:44px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+input[type=text],textarea{font:inherit;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+textarea{min-height:76px;resize:vertical}
+.fb{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.fb-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+.mark{font-family:var(--mono);font-weight:500;font-size:.82rem;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.mark.full{background:var(--good-soft);color:var(--good)} .mark.half{background:var(--half-soft);color:var(--half)} .mark.wrong{background:var(--bad-soft);color:var(--bad)} .mark.neutral{background:var(--chip);color:var(--ink-2)}
+.why{border-left:3px solid var(--navy);padding-left:12px;font-family:var(--serif);font-size:1.02rem}
+.alert{border-radius:10px;padding:10px 12px;background:var(--half-soft);border:1.5px solid var(--half)}
+.compare{border-radius:10px;padding:10px 12px;background:var(--chip)}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;font-size:.76rem;text-align:center}
+.strip div{padding:8px 4px;border-radius:8px;background:var(--chip);color:var(--ink-2);line-height:1.25}
+.strip div.on{background:var(--navy);color:var(--panel);font-weight:600}
+.strip-cap{display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px;font-size:.7rem;color:var(--ink-2);text-align:center;letter-spacing:.04em;text-transform:uppercase}
+.strip-cap span{border-top:2px solid var(--line);padding-top:3px}
+/* the board: answering surface and the file that fills up */
+.board{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:4px;font-size:.8rem}
+.board .h{font-weight:600;color:var(--ink-2);padding:4px 2px;text-align:center;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;line-height:1.2}
+.board .rh{align-self:center;text-align:right;padding-right:6px;font-weight:600;color:var(--ink-2);font-size:.74rem;text-transform:uppercase;letter-spacing:.03em}
+.board .cell{font:inherit;color:var(--ink);background:var(--chip);border:1.5px solid transparent;border-radius:8px;min-height:62px;padding:5px;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;text-align:left}
+.board button.cell{cursor:pointer}
+.board button.cell:hover{border-color:var(--navy)}
+.board .cell.empty{background:transparent;border:1.5px dashed var(--line)}
+.board .cell.sel{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy);background:var(--panel)}
+.board .cell.full{border-color:var(--good);background:var(--good-soft)}
+.board .cell.half{border-color:var(--half);background:var(--half-soft)}
+.board .cell.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.board .cell .pin{font-size:.72rem;font-weight:600;padding:1px 7px;border-radius:999px;background:var(--navy);color:var(--panel)}
+.chip{font-size:.72rem;padding:1px 6px;border-radius:999px;background:var(--panel);border:1.5px solid var(--line);line-height:1.35}
+.chip.PL{border-color:var(--PL)} .chip.CN{border-color:var(--CN)} .chip.MN{border-color:var(--MN)} .chip.IT{border-color:var(--IT)} .chip.BE{border-color:var(--BE)}
+.chip.new{background:var(--navy);color:var(--panel);border-color:var(--navy)}
+.badges{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.badges{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.badge{border:1.5px solid var(--line);border-radius:12px;padding:10px;text-align:center;display:grid;gap:2px}
+.badge b{font-family:var(--serif);font-size:1.5rem}
+.badge.won{border-color:var(--good);background:var(--good-soft)}
+.code{font-family:var(--mono);font-size:.78rem;word-break:break-all;background:var(--chip);border-radius:8px;padding:10px;user-select:all}
+.toy{display:flex;align-items:flex-end;gap:4px;height:90px}
+.toy div{flex:1;background:var(--navy);border-radius:3px 3px 0 0;position:relative}
+.toy div.poor{background:var(--bad)}
+.sotd{font-family:var(--serif);font-style:italic;border-left:3px solid var(--navy);padding-left:12px}
+.two-boards{display:grid;grid-template-columns:1fr;gap:18px}
+.hidden{display:none !important}
+.flash{animation:flash .5s}
+@keyframes flash{0%{transform:scale(1)}40%{transform:scale(1.06)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){.flash{animation:none}.progress>i{transition:none}}
+</style></head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ---------- Content (the decoder and the print deck embed the same block) ---------- */
+const COLS = [
+  {k:"pre",  t:"Pre-production", s:"Shapes what people bring to the market: skills, health, wealth"},
+  {k:"prod", t:"Production",     s:"Shapes how firms hire, pay, invest and compete"},
+  {k:"post", t:"Post-production",s:"Taxes and transfers after market incomes are earned"}
+];
+const ROWS = [
+  {k:"bottom", t:"Bottom", s:"low incomes"},
+  {k:"middle", t:"Middle", s:"middle class"},
+  {k:"top",    t:"Top",    s:"top incomes and wealth"}
+];
+const PAYERS = [
+  {k:"budget", t:"Taxpayers, through the state budget", s:"general taxes such as VAT and PIT, and borrowing when the budget is in deficit"},
+  {k:"contrib",t:"Social insurance contributions", s:"paid by workers and employers into an insurance fund"},
+  {k:"employers",t:"Employers and their customers", s:"the cost never passes through the budget"},
+  {k:"foregone",t:"Revenue the state does not collect", s:"a tax relief or exemption: other taxpayers make up the difference"},
+  {k:"targets",t:"The people or firms it targets", s:"it is itself a tax or a fine on them"},
+  {k:"mining", t:"Natural-resource revenue", s:"royalties and taxes on mining"}
+];
+const COUNTRIES = {PL:"Poland", IT:"Italy", BE:"Belgium", CN:"China", MN:"Mongolia"};
+/* Home round: the six cards of the chosen country. Abroad round: six cards picked so that every
+   column and most payers appear, with a "twin" of a home card where one exists. MIX = no home country. */
+const ABROAD = {
+  PL:["IT3","BE3","BE6","IT5","CN3","MN6"],
+  IT:["BE2","PL4","PL6","CN1","CN3","MN6"],
+  BE:["IT3","PL4","IT6","CN6","MN6","PL5"],
+  CN:["IT2","PL2","BE4","BE5","PL6","IT5"],
+  MN:["PL1","IT5","BE2","IT4","PL6","CN3"],
+  MIX:["PL1","PL2","PL6","IT2","IT3","IT4","BE3","BE4","CN3","CN6","MN5","MN6"]
+};
+/* scoring: full = 10, half = 5. Each card lists full and half answers for column, row, payer.
+   theme links cards that do the same job in different countries (used for the comparison prompt). */
+const CARDS = [
+ {id:"PL1",short:"800+",c:"PL",theme:"child",title:"Family 800+",
+  desc:"PLN 800 a month for every child under 18, with no income test (since 2019; PLN 500 from 2016, PLN 800 since January 2024). Paid by ZUS.",
+  facts:["State budget spending in 2024: PLN 66.2 billion"],
+  col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["budget"]},
+  why:"A cash transfer paid after market incomes are earned: post-production, so redistribution. Because it is universal it reaches the bottom and the middle; Rodrik & Stantcheva list family and child benefits in the bottom row. It is paid from the state budget, that is, by taxpayers, and in deficit years partly by borrowing.",
+  hint:{col:{pre:"Paying for children does not change what their parents earn on the market.",prod:"It does not change how firms hire or pay. It is paid by the state after incomes are earned."},pay:{contrib:"800+ is not an insurance benefit: no contributions are needed to receive it."}}},
+ {id:"PL2",short:"PL min. wage",c:"PL",theme:"wage",title:"National minimum wage",
+  desc:"The lowest monthly pay any employer may offer in Poland: PLN 4,806 gross in 2026 (PLN 31.40 an hour), set every year by the government.",
+  facts:["Council of Ministers regulation of 11 September 2025"],
+  col:{full:["prod"]}, row:{full:["bottom"]}, pay:{full:["employers"]},
+  why:"It changes what the market pays, during production: predistribution. It aims at the bottom of the wage scale. The budget pays nothing: employers pay higher wages, customers may pay higher prices, and if some jobs are not created, the would-be workers pay. A cost can be real without appearing in the budget.",
+  hint:{col:{post:"The money never passes through the state: the employer pays it as a wage.",pre:"It does not change workers' skills; it changes what firms must pay them."},pay:{budget:"Look at who writes the cheque: the employer, not the state."}}},
+ {id:"PL3",short:"PL schooling",c:"PL",theme:"school",title:"Compulsory schooling to 18, free public schools",
+  desc:"Poland's Constitution (Art. 70) makes education compulsory until age 18 and education in public schools free of charge. Schools are run by local governments, financed largely by a central education subsidy.",
+  facts:[],
+  col:{full:["pre"]}, row:{full:["bottom"],half:["middle"]}, pay:{full:["budget"]},
+  why:"It builds the skills people bring to the market: pre-production, so predistribution. Rodrik & Stantcheva put primary and lower-secondary schooling in the bottom row, because for poor families it is the main source of skills they could not buy. It is paid by taxpayers: predistribution still needs tax money.",
+  hint:{col:{post:"Nobody receives cash; the policy changes skills before people earn anything.",prod:"Schooling happens before the labour market, not inside firms."},row:{middle:"Everyone attends, but the gain is largest for children whose parents could not pay for schooling: the bottom row."}}},
+ {id:"PL4",short:"PL child relief",c:"PL",theme:"relief",title:"Child tax relief (ulga na dzieci)",
+  desc:"Parents deduct a fixed amount from their personal income tax: PLN 1,112.04 a year for each of the first two children, more for the third and later children. Only families who pay enough tax and social contributions get the full value.",
+  facts:["The unused part is refunded only up to the contributions the family paid"],
+  col:{full:["post"],half:["prod"]}, row:{full:["middle"],half:["bottom"]}, pay:{full:["foregone"],half:["budget"]},
+  why:"It works through the tax system after income is earned: post-production. Because it needs taxable earnings it favours working, middle-income families; a family with no earnings gets nothing (Titmuss's fiscal welfare). Its cost never appears as spending: it is revenue the state does not collect. Half points for production: like the US EITC, it rewards earning.",
+  hint:{row:{top:"There is an income limit for families with one child, and the deduction is the same amount for everyone, so it matters little at the top."},pay:{employers:"Employers do not pay it; the tax office collects less."}}},
+ {id:"PL5",short:"PL solidarity levy",c:"PL",theme:"toptax",title:"Solidarity levy (danina solidarnościowa)",
+  desc:"An extra 4% tax on the part of a person's annual income above PLN 1 million, in force since 2019. The revenue goes to a fund for people with disabilities.",
+  facts:[],
+  col:{full:["post"]}, row:{full:["top"]}, pay:{full:["targets"]},
+  why:"A tax on income already earned: post-production, aimed at the top. Rodrik & Stantcheva's bottom-right cell holds top income tax rates and wealth taxes. Who pays: the top earners themselves, the people the measure targets.",
+  hint:{col:{prod:"It does not change how much firms pay; it takes a share after income is earned.",pre:"It taxes income, not the wealth or skills people bring to the market."}}},
+ {id:"PL6",short:"PL inheritance",c:"PL",theme:"inherit",title:"Inheritance tax exemption for close family",
+  desc:"A spouse, children, grandchildren, parents and siblings pay no inheritance or gift tax in Poland if they report the inheritance to the tax office within six months.",
+  facts:[],
+  col:{full:["pre"]}, row:{full:["top"]}, pay:{full:["foregone"],half:["targets"]},
+  why:"Inheritance shapes the wealth people bring to the market, so inheritance taxation is pre-production, top row (Rodrik & Stantcheva's bottom-left cell). An exemption means the cell is almost empty in Poland: the heirs pay nothing and the revenue is not collected. Half points for 'the people it targets': that is who would pay an inheritance tax, if there were one.",
+  hint:{col:{post:"Inheritance is wealth people start with, an endowment, before they enter the market.",prod:"Firms' decisions are not involved; this is about what families pass on."},row:{bottom:"Large inheritances are concentrated at the top of the wealth distribution."}}},
+ {id:"IT1",short:"Assegno unico",c:"IT",theme:"child",title:"Universal child allowance (assegno unico universale)",
+  desc:"Since March 2022 families get a monthly allowance for each child from birth to 21 (after 18 only under conditions such as being in school or training). The amount falls as the household's ISEE means indicator rises: in 2026, €203.80 per child under 18 at the lowest ISEE (up to €17,468.51) and €58.30 at the highest (above €46,582.71) or if no ISEE is filed. Paid by INPS.",
+  facts:["Legislative Decree 230/2021; 2026 amounts from INPS circular 7/2026"],
+  col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["budget"]},
+  why:"Cash after market incomes are earned: post-production, so redistribution. Every family gets it, but a low-ISEE family gets three and a half times as much per child, so it reaches the bottom and the middle: universal, but graded by means. It is paid from the state budget through INPS; nobody needs a contribution record to receive it.",
+  hint:{col:{pre:"Cash for families does not change the skills or wealth parents bring to the market.",prod:"Firms play no part; the state pays after incomes are earned."},pay:{contrib:"INPS pays it, but it is not insurance: no contributions are needed to receive it."},row:{top:"The richest families get the minimum amount; the money is weighted towards low and middle incomes."}}},
+ {id:"IT2",short:"Assegno di inclusione",c:"IT",theme:"assist",title:"Inclusion allowance (assegno di inclusione)",
+  desc:"Italy's minimum income since 2024, replacing the citizens' income (reddito di cittadinanza). Only households with a child, a person with a disability, a member aged 60 or over, or someone in a care programme can apply, with an ISEE of at most €10,140. Up to €6,500 a year, multiplied by an equivalence scale, plus up to €3,640 a year for renters.",
+  facts:["Paid by INPS on an inclusion card"],
+  col:{full:["post"]}, row:{full:["bottom"]}, pay:{full:["budget"]},
+  why:"A means-tested top-up after incomes are earned: post-production, bottom row, like China's Dibao and France's RSA in Rodrik & Stantcheva. Taxpayers pay through the budget. Notice the gate: poor adults of working age with no children, disability or care needs cannot apply. Who is left out is a design choice, the topic of Session 6.",
+  hint:{col:{prod:"It does not change wages; it tops up income afterwards.",pre:"It pays cash now; it does not build skills or assets."},row:{middle:"An ISEE limit of €10,140 keeps it at the very bottom."},pay:{contrib:"No contribution record is needed: it is assistance, not insurance."}}},
+ {id:"IT3",short:"IT wage agreements",c:"IT",theme:"wage",title:"Wage floors set by collective agreements",
+  desc:"Italy has no statutory minimum wage. Minimum pay is set in national sectoral collective agreements (CCNL): about 1,000 of them, covering close to 100% of employees (CNEL, 2025). Courts use the agreement's wage as the benchmark for the 'fair pay' guaranteed by Article 36 of the Constitution.",
+  facts:["Many agreements are renewed late: CNEL counted 62% past their expiry date"],
+  col:{full:["prod"]}, row:{full:["bottom"],half:["middle"]}, pay:{full:["employers"]},
+  why:"Collective agreements change what the market pays: production stage, predistribution. The floors protect the bottom of each sector's pay scale, and the scales also set middle wages (half points). Employers and their customers pay, as with a statutory minimum wage, but the floor is set by unions and employers, not by the government: bargaining power, a Session 3 mechanism. The weak spot is time: an agreement that is renewed late lets the floor fall behind prices.",
+  hint:{col:{post:"No money passes through the state: employers pay the agreed wages.",pre:"It does not change workers' skills; it changes what firms must pay them."},pay:{budget:"The state pays nothing here; employers pay the agreed wages."}}},
+ {id:"IT4",short:"IT tax cut 35→33",c:"IT",theme:"relief",title:"Income tax cut for the middle (2026)",
+  desc:"Italy's 2026 budget law (Law 199/2025) cut the personal income tax (IRPEF) rate on income between €28,000 and €50,000 from 35% to 33%. The other two rates stay: 23% up to €28,000 and 43% above €50,000.",
+  facts:["The largest gain is 2% of €22,000: €440 a year"],
+  col:{full:["post"]}, row:{full:["middle"],half:["top"]}, pay:{full:["foregone"],half:["budget"]},
+  why:"A change in the tax people pay after income is earned: post-production. The gain starts at €28,000 and stops growing at €50,000, so the middle is the target; people above €50,000 also get the full €440 (half points for the top). Who pays? Nobody gets a bill: it is revenue the state stops collecting, made up by other taxes, spending cuts or borrowing (half points for the budget).",
+  hint:{row:{bottom:"Below €28,000 a year nothing changes."},pay:{targets:"The people it targets gain from it; they do not pay for it."}}},
+ {id:"IT5",short:"IT pension contrib.",c:"IT",theme:"pension",title:"Pension contributions: 33% of gross pay",
+  desc:"Employees in Italy's main pension fund (FPLD, run by INPS) pay 33% of gross pay into it: 9.19% is deducted from the wage and 23.81% is paid by the employer. Pensions are paid from the fund.",
+  facts:["Rates confirmed in INPS circular 27/2025"],
+  col:{full:["post"]}, row:{full:["middle"],half:["bottom"]}, pay:{full:["contrib"],half:["employers"]},
+  why:"Social insurance moves income from working years to old age after wages are earned: post-production. Pensions follow past earnings, so they protect mainly the middle; the bottom gains too, but less (half points). Who pays: contributions, the insurance layer. Half points for employers: they write the cheque for 23.81%, but whether the firm or the worker (through lower wages) really bears it is a classic question of tax incidence.",
+  hint:{col:{prod:"The contribution is collected on wages already earned, and the pension is paid later by the fund.",pre:"It does not change skills or wealth people bring to the market."},pay:{budget:"The fund is filled by contributions, not general taxes."}}},
+ {id:"IT6",short:"IT inheritance",c:"IT",theme:"inherit",title:"Inheritance tax: 4% above €1 million",
+  desc:"In Italy a spouse or child pays inheritance tax of 4%, and only on the part of their own share above €1 million. Siblings pay 6% above €100,000; other heirs 6–8%.",
+  facts:[],
+  col:{full:["pre"]}, row:{full:["top"]}, pay:{full:["targets"],half:["foregone"]},
+  why:"Inheritance is wealth people bring to the market: pre-production, top row (Rodrik & Stantcheva's inheritance cell). The heirs pay, but with €1 million exempt per heir, most estates pay nothing (half points for revenue not collected). Compare: Poland exempts close family completely; Flanders charges children up to 27%.",
+  hint:{col:{post:"Inheritance is wealth people start with, an endowment, before they enter the market.",prod:"Firms' decisions are not involved; this is about what families pass on."},row:{middle:"With €1 million exempt per heir, middle-class heirs pay nothing."}}},
+ {id:"BE1",short:"Groeipakket",c:"BE",theme:"child",title:"Growth Package (Groeipakket), Flanders",
+  desc:"In Flanders every child born since 2019 gets a basic €190.66 a month (from September 2026) whatever the parents earn, plus a social supplement for lower-income families: for example €76.09 per child for one or two children if household income is below €42,020. Since 2019 family benefits belong to the communities; Wallonia, Brussels and the German-speaking Community run their own systems.",
+  facts:[],
+  col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["budget"]},
+  why:"A universal base plus a means-tested top-up: post-production, reaching the bottom (the supplement) and the middle (the base). Paid from the Flemish budget, that is, by taxpayers. Same cell as Poland's 800+ and Italy's assegno unico; the design inside the cell differs, which is the topic of Session 6.",
+  hint:{col:{pre:"Cash for families does not change the skills or wealth parents bring to the market.",prod:"Firms play no part; the government pays after incomes are earned."},pay:{contrib:"No contribution record is needed: every child is entitled."}}},
+ {id:"BE2",short:"BE min. wage",c:"BE",theme:"wage",title:"Guaranteed minimum monthly income",
+  desc:"Belgium's national minimum wage is €2,189.81 gross a month for workers aged 18 and over from 1 April 2026. It is set not by law but by unions and employers in the National Labour Council (collective agreement no. 43), and it is indexed automatically to prices.",
+  facts:["The April 2026 rise (€35) was agreed by the social partners in 2021"],
+  col:{full:["prod"]}, row:{full:["bottom"]}, pay:{full:["employers"]},
+  why:"Production stage, bottom row, paid by employers and their customers: the same cell as Poland's minimum wage. The difference is who sets it. In Poland the government decides; in Belgium unions and employers agree. Same cell, different mechanism: bargaining power.",
+  hint:{col:{post:"The money is a wage paid by the employer, not a transfer.",pre:"It does not change workers' skills; it changes what firms must pay them."},pay:{budget:"The state sets the frame; employers pay the wage."}}},
+ {id:"BE3",short:"BE wage indexation",c:"BE",theme:"index",title:"Automatic wage indexation",
+  desc:"In Belgium wages rise automatically with a price index (the 'health index'). The rules are set sector by sector in joint committees of unions and employers, whose agreements cover about 96% of employees. A law, tightened in 2017, caps real pay rises on top of indexation.",
+  facts:[],
+  col:{full:["prod"]}, row:{full:["middle"],half:["bottom"]}, pay:{full:["employers"]},
+  why:"It changes what firms must pay: production stage, predistribution. It protects the real wages of nearly all employees, so above all the large middle (half points for the bottom). Paid by employers and their customers. This is the middle row of the production column, Rodrik & Stantcheva's 'good jobs' cell, the one that stays empty in most countries' decks.",
+  hint:{col:{post:"No money passes through the state: employers pay the indexed wages.",pre:"It does not change skills; it changes what firms must pay."},row:{top:"It covers everyone's wage, but it matters most for the many in the middle."},pay:{budget:"The state pays nothing; employers pay the higher wages."}}},
+ {id:"BE4",short:"BE school from 5",c:"BE",theme:"school",title:"Compulsory school from age 5",
+  desc:"Since September 2020 compulsory education in Belgium starts at 5 instead of 6, so every child spends at least one year in kindergarten before primary school. It lasts until 18, and education is free until the end of compulsory schooling.",
+  facts:[],
+  col:{full:["pre"]}, row:{full:["bottom"],half:["middle"]}, pay:{full:["budget"]},
+  why:"Early education builds the skills children bring to the market later: pre-production, predistribution. Everyone attends, but the gain is largest for children who would otherwise have skipped kindergarten, more often those from poorer homes: bottom row (half points for middle). Paid by taxpayers through the communities' budgets.",
+  hint:{col:{post:"Nobody receives cash; the policy changes skills before people earn anything.",prod:"Schooling happens before the labour market, not inside firms."},row:{middle:"Everyone attends, but the gain is largest for children who would otherwise miss kindergarten."}}},
+ {id:"BE5",short:"BE securities tax",c:"BE",theme:"toptax",title:"Tax on securities accounts",
+  desc:"Since 2021 Belgium charges 0.15% a year on securities accounts (shares, bonds, funds) whose average value is above €1 million (Law of 17 February 2021).",
+  facts:[],
+  col:{full:["post"],half:["pre"]}, row:{full:["top"]}, pay:{full:["targets"]},
+  why:"A yearly tax on wealth already held: Rodrik & Stantcheva put wealth taxes in the top row of the post-production column, next to top income tax rates. Half points for pre-production: wealth is an endowment, though this tax is collected every year rather than when wealth passes to the next generation. The account holders pay. A low rate on a narrow base: the top row usually holds few instruments.",
+  hint:{col:{prod:"It does not change how firms pay or compete; it taxes wealth people hold."},row:{middle:"Below €1 million nothing is due."}}},
+ {id:"BE6",short:"BE inheritance",c:"BE",theme:"inherit",title:"Inheritance tax, Flanders",
+  desc:"In Flanders children and spouses pay inheritance tax on their own share at 3% up to €50,000, 9% from €50,000 to €250,000 and 27% above. The rates are set by the regions; Brussels and Wallonia have their own scales.",
+  facts:[],
+  col:{full:["pre"]}, row:{full:["top"],half:["middle"]}, pay:{full:["targets"]},
+  why:"Inheritance is wealth people bring to the market: pre-production, top row, paid by the heirs. With rates starting at 3%, middle-class heirs pay too (half points for middle). One cell, three very different fillings: 0% for close family in Poland, 4% above €1 million in Italy, up to 27% in Flanders.",
+  hint:{col:{post:"Inheritance is wealth people start with, an endowment, before they enter the market.",prod:"Firms' decisions are not involved; this is about what families pass on."},pay:{foregone:"Here the tax is actually collected: the heirs pay."}}},
+ {id:"CN1",short:"Dibao",c:"CN",theme:"assist",title:"Dibao (minimum living guarantee)",
+  desc:"China's means-tested cash assistance: households whose income per person is below a local line receive a top-up. About 40 million people received it in 2022, under 3% of the population.",
+  facts:["Financed jointly by central and local governments"],
+  col:{full:["post"]}, row:{full:["bottom"]}, pay:{full:["budget"]},
+  why:"A means-tested transfer after incomes are earned: post-production, bottom row (like France's RSA in Rodrik & Stantcheva). It is paid from central and local budgets, that is, by taxpayers.",
+  hint:{col:{prod:"It does not change wages; it tops up income afterwards.",pre:"It pays cash now; it does not build skills or assets."},row:{middle:"A means test keeps it at the very bottom."}}},
+ {id:"CN2",short:"CN childcare",c:"CN",theme:"child",title:"National childcare subsidy (2025)",
+  desc:"RMB 3,600 a year for each child under three, for children born from 1 January 2025 (earlier-born children under three get a proportional amount). No income test.",
+  facts:["Central government pays about 90%; about RMB 90 billion in 2025"],
+  col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["budget"]},
+  why:"Cash paid to families after incomes are earned: post-production. Universal, so bottom and middle, like 800+. Paid from the budget, mostly the central one. It is called a childcare subsidy, but it is cash, not childcare places: the name does not decide the cell.",
+  hint:{col:{pre:"Childcare places would build children's capabilities; this is a cash payment to parents."}}},
+ {id:"CN3",short:"CN antitrust",c:"CN",theme:"antitrust",title:"Anti-monopoly fine on a platform giant",
+  desc:"In April 2021 China's market regulator fined Alibaba RMB 18.2 billion for abusing its dominant position, forcing merchants to sell only on its platform.",
+  facts:[],
+  col:{full:["prod"]}, row:{full:["top"]}, pay:{full:["targets"]},
+  why:"Competition policy shapes how firms behave in the market: production stage. It targets the market power of the largest firms and their owners: top row (Rodrik & Stantcheva's antitrust cell). The firm that broke the rules pays.",
+  hint:{col:{post:"It is not a tax on income already earned; it changes how a firm may compete.",pre:"It is about how firms behave in the market, not what people bring to it."}}},
+ {id:"CN4",short:"CN min. wage",c:"CN",theme:"wage",title:"Local minimum wages",
+  desc:"China has no single national minimum wage: each province sets its own. Shanghai's rose to RMB 2,740 a month on 1 July 2025 (from RMB 2,690); Beijing's is RMB 2,420.",
+  facts:[],
+  col:{full:["prod"]}, row:{full:["bottom"]}, pay:{full:["employers"]},
+  why:"Production stage, bottom row, paid by employers and their customers: the same cell as the minimum wages of Poland, Belgium and Mongolia. Because local governments set it, the floor differs from place to place: one country can fill the same cell differently in different regions, as Belgium does with family benefits.",
+  hint:{col:{post:"The money is a wage paid by the employer, not a transfer.",pre:"It does not change workers' skills; it changes what firms must pay them."},pay:{budget:"The state sets the rule; employers pay."}}},
+ {id:"CN5",short:"CN income tax",c:"CN",theme:"toptax",title:"Progressive individual income tax",
+  desc:"China taxes wage income at progressive rates from 3% to 45%, after a basic deduction of RMB 60,000 a year (RMB 5,000 a month), set by the 2018 reform of the income tax law.",
+  facts:[],
+  col:{full:["post"]}, row:{full:["top"],half:["middle"]}, pay:{full:["targets"]},
+  why:"A tax on income after it is earned: post-production. With RMB 60,000 a year deducted, many workers pay nothing, and the rates rise steeply at the top: the cell where Rodrik & Stantcheva put progressive income taxation. Who pays: the higher earners themselves. Half points for middle: urban middle earners above the deduction pay the lower rates.",
+  hint:{col:{prod:"It does not change what employers pay; it takes a share afterwards."},pay:{foregone:"The deduction is a relief, but the instrument as a whole is a tax collected from earners."}}},
+ {id:"CN6",short:"CN free preschool",c:"CN",theme:"school",title:"Free final year of preschool",
+  desc:"From autumn 2025 public kindergartens in China no longer charge care and education fees for children in their last preschool year (meals and boarding are still paid). Private kindergartens cut their fees by the same amount, and the government covers the lost income (State Council General Office guideline, August 2025).",
+  facts:[],
+  col:{full:["pre"]}, row:{full:["bottom"],half:["middle"]}, pay:{full:["budget"]},
+  why:"Early education builds skills before people reach the market: pre-production, predistribution. Every child is covered, but the fee waiver matters most to families who could not otherwise pay: bottom row (half points for middle). Paid by taxpayers through government budgets. Compare Belgium, which pursued the same goal by making school compulsory from age 5.",
+  hint:{col:{post:"Families do not receive cash; the policy builds children's skills before they reach the market.",prod:"Kindergarten comes long before the labour market."},row:{middle:"Everyone is covered, but the fee waiver matters most to families who could not otherwise pay."}}},
+ {id:"MN1",short:"MN child money",c:"MN",theme:"child",title:"Child Money Programme",
+  desc:"Mongolia pays MNT 100,000 a month for every child. In early 2023 it was targeted at 91% of children; universal coverage was restored in July 2023.",
+  facts:["Earlier rounds were funded partly from mining revenue (2006–2012)"],
+  col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["budget"],half:["mining"]},
+  why:"Cash after incomes are earned: post-production, bottom and middle because it is universal. Today it is paid from the state budget. Half points for mining revenue: in 2006–2012 child money was topped up from a mining windfall tax and the Human Development Fund, and the fund ran into deficits when spending outran mining revenue.",
+  hint:{col:{pre:"Cash for families does not change skills or wealth people bring to the market."}}},
+ {id:"MN2",short:"MN min. wage",c:"MN",theme:"wage",title:"Minimum wage",
+  desc:"Mongolia's monthly minimum wage rose to MNT 792,000 on 1 April 2025 (from MNT 660,000). In August 2026 the national committee on labour and social partnership agreed a rise to MNT 1,000,000 from 1 January 2027.",
+  facts:[],
+  col:{full:["prod"]}, row:{full:["bottom"]}, pay:{full:["employers"]},
+  why:"Same cell as Poland's: production stage, bottom row, paid by employers and their customers. The national committee brings government, unions and employers to one table: collective bargaining at national level, bargaining power, one of the three inequality mechanisms from Session 3.",
+  hint:{col:{post:"The money is a wage paid by the employer, not a transfer."},pay:{budget:"The state sets the rule; employers pay."}}},
+ {id:"MN3",short:"MN income tax",c:"MN",theme:"toptax",title:"Progressive personal income tax",
+  desc:"Since 2023 Mongolia taxes wage income at 10%, 15% and 20%: 15% on income above MNT 120 million a year and 20% above MNT 180 million.",
+  facts:[],
+  col:{full:["post"]}, row:{full:["top"],half:["middle"]}, pay:{full:["targets"]},
+  why:"A tax on earned income: post-production. The higher rates fall on the top, the cell where Rodrik & Stantcheva put progressive income taxation. Who pays: higher earners. Half points for middle: every wage earner pays the 10% base rate.",
+  hint:{col:{prod:"It does not change what employers pay; it takes a share afterwards."}}},
+ {id:"MN4",short:"MN school lunch",c:"MN",theme:"school",title:"Free school lunch, grades 1–5",
+  desc:"Mongolia gives a free lunch at school to primary pupils in grades 1–5: about 382,000 children in 2022/23, paid entirely from the government budget. A school snack programme ran from 2006; lunches replaced it from 2021.",
+  facts:["Global Child Nutrition Foundation, country survey 2024"],
+  col:{full:["pre"],half:["post"]}, row:{full:["bottom"],half:["middle"]}, pay:{full:["budget"]},
+  why:"Food at school supports children's health and learning, the endowments they bring to the market later: pre-production. Half points for post-production: it is also an in-kind transfer to families today. Every pupil eats, but a free meal matters most to poor families: bottom row (half points for middle). Paid by taxpayers through the budget.",
+  hint:{col:{prod:"Firms play no part; this is about children's health and learning."},pay:{mining:"The survey reports the government budget as the only funder."}}},
+ {id:"MN5",short:"MN pension contrib.",c:"MN",theme:"pension",title:"Pension insurance contributions",
+  desc:"Mongolian employees pay 8.5% of their wage into pension insurance and employers add another 8.5%. With health, benefit and unemployment insurance, employees pay 11.5% in total and employers 12.5–14.5%.",
+  facts:["Rates from PwC Worldwide Tax Summaries, Mongolia"],
+  col:{full:["post"]}, row:{full:["middle"],half:["bottom"]}, pay:{full:["contrib"],half:["employers"]},
+  why:"Social insurance moves income from working years to old age after wages are earned: post-production. Pensions follow past earnings, so they protect mainly the middle (half points for the bottom). Who pays: contributions. Half points for employers: they pay half, but who really bears it, firm or worker, is a question of tax incidence. Compare Italy: 33% of gross pay for pensions, almost twice Mongolia's 17%.",
+  hint:{col:{prod:"The contribution is collected on wages already earned; the pension is paid later.",pre:"It does not change skills or wealth people bring to the market."},pay:{budget:"The fund is filled by contributions, not general taxes."}}},
+ {id:"MN6",short:"MN HDF cash",c:"MN",theme:"mining",title:"Human Development Fund: cash for every citizen (2010–2012)",
+  desc:"From 2010 to 2012 every citizen of Mongolia received MNT 21,000 a month from the Human Development Fund, which was fed by mining revenue. In 2012 the fund spent up to 18% of government revenue while its mining income was about half that. After the 2012 election the universal payments stopped; only child money continued.",
+  facts:["In 2016 the fund's debts of MNT 1.07 trillion were moved to the new Future Heritage Fund"],
+  col:{full:["post"]}, row:{full:["bottom","middle"]}, pay:{full:["mining"],half:["budget"]},
+  why:"A universal cash transfer: post-production, bottom and middle. It was meant to be paid from mining revenue, a payer most countries do not have. When spending outran mining income the fund ran up debts that the state had to take over (half points for the budget). A promise tied to commodity prices is a fragile promise.",
+  hint:{col:{pre:"Cash today does not change skills or wealth people bring to the market."},pay:{targets:"Citizens received the money; mining companies' royalties and taxes were meant to pay for it."}}}
+];
+const BOSS = [
+ {claim:"“The minimum wage costs the state nothing, so nobody pays for it.”", ans:false,
+  why:"The budget pays nothing, but employers, customers or people not hired may pay. Off-budget is not free."},
+ {claim:"“A monthly child benefit is predistribution, because it is paid before parents pay their income tax.”", ans:false,
+  why:"Predistribution changes what the market pays. A child benefit changes what families keep after the market has paid: redistribution, whatever the timing of the payment."},
+ {claim:"“A country that invests enough in free public schools can do without progressive taxes.”", ans:false,
+  why:"Schools need tax money, and parents' own inputs still differ. Haaparanta, Kanbur, Pirttilä, Tuomala and co-authors: “pre-distribution requires redistribution, and redistribution aids pre-distribution.”"},
+ {claim:"“A tax relief can cost the state as much as a benefit, yet never appear as spending.”", ans:true,
+  why:"Revenue not collected is a cost. Titmuss called it fiscal welfare; budget documents call it a tax expenditure."}
+];
+const TOY = [10,14,18,22,26,30,36,44,60,140];
+const CONF = [
+  {k:"sure",  t:"Sure",     s:"+5 if all right, −5 if any part is wrong"},
+  {k:"think", t:"I think so", s:"no bonus, no risk"},
+  {k:"guess", t:"Guessing", s:"no bonus, no risk"}
+];
+
+/* ---------- State ---------- */
+const byId = id => CARDS.find(c=>c.id===id);
+const blank = () => ({col:null,row:null,pay:null,conf:null,checked:false,pts:0});
+const S = {screen:"intro", name:"", home:null, deck:[], nHome:0, warm:[null,null], i:0, ans:[], boss:BOSS.map(()=>null), score:0, start:null, note:""};
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const grade = (spec, v) => spec.full.includes(v) ? "full" : (spec.half||[]).includes(v) ? "half" : "wrong";
+const PTS = {full:10, half:5, wrong:0};
+const label = (list,k) => (list.find(x=>x.k===k)||{}).t || "—";
+const homeName = () => S.home==="MIX" ? "Mixed deck" : COUNTRIES[S.home];
+
+function buildDeck(home){
+  const own = home==="MIX" ? [] : CARDS.filter(c=>c.c===home).map(c=>c.id);
+  S.deck = own.concat(ABROAD[home]).map(byId);
+  S.nHome = own.length;
+  S.ans = S.deck.map(blank);
+}
+/* the cell a card moves to after checking: the student's cell if it is fully right, otherwise the first right one */
+function homeCell(c, a){
+  const col = c.col.full.includes(a.col) ? a.col : c.col.full[0];
+  const row = c.row.full.includes(a.row) ? a.row : c.row.full[0];
+  return row+"|"+col;
+}
+
+function header(){
+  const done = S.ans.filter(a=>a.checked).length;
+  const pct = ["card","interlude"].includes(S.screen) ? (done/S.deck.length)*100 : S.screen==="boss"||S.screen==="end" ? 100 : 0;
+  return `<div class="topbar"><span class="eyebrow">Session 5 · Matrix Detective</span><span class="score" aria-live="polite">${S.score} pts</span></div>
+  <div class="progress" aria-hidden="true"><i style="width:${pct}%"></i></div>`;
+}
+
+function render(){
+  let h = header();
+  if (S.screen==="intro") h += intro();
+  else if (S.screen==="warm") h += warm();
+  else if (S.screen==="card") h += card();
+  else if (S.screen==="interlude") h += interlude();
+  else if (S.screen==="boss") h += boss();
+  else h += end();
+  app.innerHTML = h;
+  bind();
+  window.scrollTo({top:0});
+}
+
+function intro(){
+  const opts = Object.keys(COUNTRIES).map(k=>[k,COUNTRIES[k]]).concat([["MIX","Mixed deck"]]);
+  const ready = S.name.trim() && S.home;
+  return `<header style="display:grid;gap:10px">
+    <h1>Matrix Detective</h1>
+    <p class="muted">You are a new policy adviser. Your first file is a country you know; your second file is a study trip abroad. For each real policy you decide <b>where it sits</b> in the matrix, <b>who pays</b>, and <b>how sure you are</b>. About 15–20 minutes. Read Rodrik &amp; Stantcheva (2021), pp. 1–6, first.</p>
+  </header>
+  <section class="panel">
+    <h2>The tool: one matrix</h2>
+    ${stripHTML(null)}
+    <p><b>Predistribution</b> changes what the market pays. <b>Redistribution</b> changes what people keep. Rodrik &amp; Stantcheva split predistribution into two stages (pre-production and production) and call redistribution post-production. The rows ask whose income the policy mainly targets: bottom, middle or top.</p>
+  </section>
+  <section class="panel">
+    <label class="q"><span class="q-title"><span class="n">1</span>Your name (as on the attendance list)</span>
+      <input type="text" id="name" autocomplete="name" value="${esc(S.name)}" maxlength="60"></label>
+    <div class="q"><span class="q-title"><span class="n">2</span>Your first file: which country do you know best?</span>
+      <p class="small muted">You get six of its policies first, then six from other countries to compare. It does not have to be your own country, and the mixed deck is fine too.</p>
+      <div class="countries">${opts.map(([k,t])=>`<button class="opt" data-g="home" data-v="${k}" aria-pressed="${S.home===k}"><span class="${k==="MIX"?"":"c-"+k}">${t}</span></button>`).join("")}</div></div>
+    <p class="small muted">Scoring: 10 points for each right decision, 5 for a defensible second answer, a 5-point bonus for a perfect card, and ±5 when you say you are sure. At the end you get a result code to paste into Classroom. No AI needed, none allowed in class.</p>
+    <div class="actions"><button class="btn" id="go" ${ready?"":"disabled"}>Start with a warm-up</button></div>
+  </section>`;
+}
+
+function stripHTML(active){
+  const cells = [["pre","Endowments<br>skills, wealth"],["prod","Market<br>jobs, wages, firms"],["post","Taxes &amp;<br>transfers"],["keep","What people<br>keep"]];
+  return `<div style="display:grid;gap:4px"><div class="strip">${cells.map(([k,t])=>`<div class="${k===active?"on":""}">${t}</div>`).join("")}</div>
+  <div class="strip-cap"><span>Predistribution: pre-production + production</span><span>Redistribution</span><span>Result</span></div></div>`;
+}
+
+function toyBars(vals, line){
+  const max = 50;
+  return `<div class="toy" aria-hidden="true">${vals.map(v=>`<div class="${v<line?"poor":""}" style="height:${Math.min(v,max)/max*100}%"></div>`).join("")}</div>`;
+}
+
+function warm(){
+  const opts = ["It falls","It stays the same","It rises","Cannot tell"];
+  const opts2 = ["It falls","It stays the same","It rises"];
+  const [a,b] = S.warm;
+  const done = !!S._warmDone;
+  const c1 = i => done ? (i===1?"full":(i===a?"wrong":"")) : "";
+  const c2 = i => done ? (i===2?"full":(i===b?"wrong":"")) : "";
+  return `<section class="panel">
+    <span class="eyebrow">Warm-up from Session 4</span>
+    <h2>A recession in the toy society</h2>
+    <p>Back to the ten incomes from last week (10, 14, 18, 22, 26, 30, 36, 44, 60, 140; median 28; relative line 60% of the median = 16.8; two households poor, 20%). Now <b>every income falls by 10%</b>.</p>
+    ${done ? "" : toyBars(TOY, 16.8)}
+    <div class="q"><span class="q-title"><span class="n">1</span>What happens to the <b>relative</b> poverty rate?</span>
+      <div class="opts">${opts.map((o,i)=>btn("w0",i,o,a,c1(i))).join("")}</div></div>
+    <div class="q"><span class="q-title"><span class="n">2</span>And the <b>anchored</b> rate (line kept at 16.8)?</span>
+      <div class="opts">${opts2.map((o,i)=>btn("w1",i,o,b,c2(i))).join("")}</div></div>
+    ${done ? `<div class="fb">
+      ${toyBars(TOY.map(x=>x*0.9), 15.12)}
+      <p class="small muted">After the recession; red = below the relative line of 15.12.</p>
+      <p class="why">The median falls to 25.2 and the relative line to 15.12, exactly as fast as the poorest incomes (9 and 12.6). The same two households stay below, so the relative rate <b>stays at 20%</b>. Against the anchored line of 16.8, household 3 (the pensioner, now 16.2) falls below too: the anchored rate <b>rises to 30%</b>. The line is an amount; the rate is a share of people below it.</p>
+      <div class="compare small" style="display:grid;gap:6px">
+        <p><b>Check it yourself in the Toy Society Lab</b> (opens in a new tab; this game stays here).</p>
+        <p>1. Choose the scenario <b>No change</b>. 2. Set <b>Earnings change</b> to −10% and <b>Pensions change</b> to −10%: now every income falls by 10%. 3. Switch the line between <b>Relative</b> and <b>Anchored</b> and watch the poverty rate.</p>
+        <p>Bonus: run the Lab's <b>Recession</b> scenario, which cuts earnings by 30% but protects pensions. Compare the two lines again: who falls below the anchored line this time, and why is it not the pensioner?</p>
+        <p><a href="https://rszarf-1.github.io/toy-society-poverty-lab/" target="_blank" rel="noopener" style="color:inherit;font-weight:600">Open the Toy Society Lab ↗</a></p>
+      </div>
+      <div class="actions"><button class="btn" id="next">Open your first file: ${esc(homeName())}</button></div></div>`
+    : `<div class="actions"><button class="btn" id="checkw" ${a!==null&&b!==null?"":"disabled"}>Check</button></div>`}
+  </section>`;
+}
+
+function btn(group, val, text, sel, cls, sub){
+  const pressed = sel===val;
+  return `<button class="opt ${cls||""}" data-g="${group}" data-v="${val}" aria-pressed="${pressed}" ${cls?"disabled":""}>${text}${sub?`<small>${sub}</small>`:""}</button>`;
+}
+
+/* indexes of the cards in a round: 0 = home file, 1 = abroad */
+const roundIdx = r => S.deck.map((c,i)=>i).filter(i => r===0 ? i<S.nHome : i>=S.nHome);
+const inRound = i => i<S.nHome ? 0 : 1;
+
+/* the board: placed cards (already checked) sit in their right cells; while answering, cells are buttons */
+function boardHTML(opts){
+  const {idx=[], answering=false, current=null, a=null, c=null, show=false} = opts;
+  const cells = {};
+  idx.forEach(i=>{ const x=S.ans[i]; if (!x.checked) return; const k=homeCell(S.deck[i],x); (cells[k]=cells[k]||[]).push(i); });
+  const head = `<div></div>${COLS.map(cl=>`<div class="h">${cl.t}</div>`).join("")}`;
+  const body = ROWS.map(r=>`<div class="rh">${r.t}</div>${COLS.map(cl=>{
+    const k = r.k+"|"+cl.k, L = cells[k]||[];
+    const chips = L.map(i=>`<span class="chip ${S.deck[i].c} ${i===current&&show?"new":""}">${esc(S.deck[i].short)}</span>`).join("");
+    if (answering){
+      let cls = "";
+      if (show){
+        const gc = grade(c.col,cl.k), gr = grade(c.row,r.k);
+        if (gc==="full" && gr==="full") cls = "full";
+        else if (gc!=="wrong" && gr!=="wrong") cls = "half";
+        if (a.col===cl.k && a.row===r.k && !cls) cls = "wrong";
+      } else if (a.col===cl.k && a.row===r.k) cls = "sel";
+      const pin = (a.col===cl.k && a.row===r.k) ? `<span class="pin">${show?"your pick":"here"}</span>` : "";
+      return show ? `<div class="cell ${cls}">${pin}${chips}</div>`
+        : `<button class="cell ${cls}" data-g="cell" data-v="${k}" aria-pressed="${!!pin}" aria-label="${r.t}, ${cl.t}">${pin}${chips}</button>`;
+    }
+    return `<div class="cell ${L.length?"":"empty"}">${chips}</div>`;
+  }).join("")}`).join("");
+  return `<div class="board">${head}${body}</div>`;
+}
+
+function card(){
+  const c = S.deck[S.i], a = S.ans[S.i], r = inRound(S.i);
+  const show = a.checked;
+  const ridx = roundIdx(r);
+  const pos = ridx.indexOf(S.i)+1;
+  const cls = (spec,list,k) => show ? (spec.full.includes(k)?"full":(spec.half||[]).includes(k)?"half":(a[list]===k?"wrong":"")) : "";
+  const allSet = a.col && a.row && a.pay && a.conf;
+  const roundName = (S.home==="MIX") ? "Mixed deck" : r===0 ? `File 1 · ${COUNTRIES[S.home]}` : "File 2 · Abroad";
+  let fb = "";
+  if (show){
+    const g = {col:grade(c.col,a.col), row:grade(c.row,a.row), pay:grade(c.pay,a.pay)};
+    const hint = (d) => (c.hint && c.hint[d] && c.hint[d][a[d]]) ? ` ${c.hint[d][a[d]]}` : "";
+    const row = (d,name,list) => `<div class="fb-row"><span class="mark ${g[d]}">${g[d]==="full"?"+10":g[d]==="half"?"+5":"0"}</span><span><b>${name}:</b> you chose ${esc(label(list,a[d]))}.${g[d]!=="full"?esc(hint(d)):""}</span></div>`;
+    const perfect = g.col==="full" && g.row==="full" && g.pay==="full";
+    const anyWrong = [g.col,g.row,g.pay].includes("wrong");
+    const confRow = a.conf==="sure"
+      ? (perfect ? `<div class="fb-row"><span class="mark full">+5</span><span>You were sure, and right.</span></div>`
+        : anyWrong ? `<div class="fb-row"><span class="mark wrong">−5</span><span>You were sure.</span></div>`
+        : `<div class="fb-row"><span class="mark neutral">±0</span><span>You were sure; half right, so no bonus and no loss.</span></div>`) : "";
+    const surprise = (a.conf==="sure" && anyWrong) ? `<p class="alert small"><b>A surprise is worth more than a lucky guess.</b> Mistakes made with confidence are the ones people correct best once they see why. Read the explanation below twice.</p>` : "";
+    const twin = r===1 && S.home!=="MIX" ? S.deck.slice(0,S.nHome).find(h=>h.theme===c.theme) : null;
+    const cmp = twin ? `<p class="compare small"><b>Compare with ${esc(COUNTRIES[S.home])}:</b> ${esc(twin.title)} sits in ${esc(cellName(twin))}, paid by ${esc(label(PAYERS,twin.pay.full[0]).toLowerCase())}. Same job, ${sameCell(c,twin)?"same cell. Is the design inside the cell different?":"a different cell. Why might the two countries have chosen differently?"}</p>` : "";
+    fb = `<div class="fb">
+      ${row("col","When",COLS)}${row("row","Whose income",ROWS)}${row("pay","Who pays",PAYERS)}
+      ${perfect?`<div class="fb-row"><span class="mark full">+5</span><span>Perfect card bonus.</span></div>`:""}
+      ${confRow}${surprise}
+      ${stripHTML(c.col.full[0])}
+      <p class="why">${esc(c.why)}</p>
+      ${cmp}
+      <div class="actions"><button class="btn" id="next">${nextLabel()}</button></div>
+    </div>`;
+  }
+  return `<section class="panel">
+    <div class="topbar"><span class="tag c-${c.c}">${COUNTRIES[c.c]}</span><span class="small muted">${esc(roundName)} · case ${pos} of ${ridx.length}</span></div>
+    <h2>${esc(c.title)}</h2>
+    <p class="card-desc">${esc(c.desc)}</p>
+    ${c.facts.length?`<ul class="facts small muted">${c.facts.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>`:""}
+    <div class="q"><span class="q-title"><span class="n">1</span>Place it on the board: when does it act (column), and whose income does it mainly target (row)?</span>
+      ${boardHTML({idx:ridx, answering:true, current:S.i, a, c, show})}
+      <p class="small muted">${show?"Green: right cell. Amber: half right. The card now sits in its right cell on your board.":"Cards you have already checked sit in their right cells. Tap a cell to place this one."}</p></div>
+    <div class="q"><span class="q-title"><span class="n">2</span>Who pays for it?</span>
+      <div class="opts pay">${PAYERS.map(o=>btn("pay",o.k,o.t,a.pay,cls(c.pay,"pay",o.k),o.s)).join("")}</div></div>
+    <div class="q"><span class="q-title"><span class="n">3</span>How sure are you?</span>
+      <div class="opts three">${CONF.map(o=>btn("conf",o.k,o.t,a.conf,show&&a.conf===o.k?"sel":"",o.s)).join("")}</div></div>
+    ${show?fb:`<div class="actions"><button class="btn" id="check" ${allSet?"":"disabled"}>Check</button></div>`}
+  </section>`;
+}
+const cellName = c => `${label(ROWS,c.row.full[0]).toLowerCase()}${c.row.full.length>1?" and "+label(ROWS,c.row.full[1]).toLowerCase():""} · ${label(COLS,c.col.full[0]).toLowerCase()}`;
+const sameCell = (x,y) => x.col.full[0]===y.col.full[0] && x.row.full.some(r=>y.row.full.includes(r));
+function nextLabel(){
+  if (S.i === S.deck.length-1) return "Final round";
+  if (S.home!=="MIX" && S.i === S.nHome-1) return `Close the ${COUNTRIES[S.home]} file`;
+  return "Next case";
+}
+
+function interlude(){
+  const idx = roundIdx(0);
+  const pts = idx.reduce((s,i)=>s+S.ans[i].pts,0);
+  return `<section class="panel">
+    <span class="eyebrow">File 1 closed</span>
+    <h2>${esc(COUNTRIES[S.home])}: your board</h2>
+    <p class="muted">Six policies, each now in its right cell. ${pts} points from this file.</p>
+    ${boardHTML({idx})}
+    <p>Look at the <b>dashed cells</b>. Rodrik &amp; Stantcheva care most about the middle of the production column: good jobs.</p>
+    <label class="q"><span class="q-title">In one sentence: what is missing from ${esc(COUNTRIES[S.home])}'s board, and does it matter? <span class="muted small">(optional; your teacher reads these before Friday)</span></span>
+      <textarea id="note" maxlength="240">${esc(S.note)}</textarea></label>
+    <div class="actions"><button class="btn" id="abroad">Open file 2: abroad</button></div>
+  </section>`;
+}
+
+function boss(){
+  const all = S.boss.every(x=>x!==null);
+  return `<section class="panel">
+    <span class="eyebrow">Final round</span>
+    <h2>The minister's briefing: true or false?</h2>
+    <p class="muted">Four claims you could hear in any ministry. 10 points each.</p>
+    ${BOSS.map((b,i)=>{
+      const v=S.boss[i]; const done=v!==null;
+      const c = (val) => done ? (val===b.ans?"full":(val===v?"wrong":"")) : "";
+      return `<div class="q"><span class="q-title"><span class="n">${i+1}</span>${esc(b.claim)}</span>
+        <div class="opts two">${btn("b"+i,1,"True",v===null?null:(v?1:0),c(true))}${btn("b"+i,0,"False",v===null?null:(v?1:0),c(false))}</div>
+        ${done?`<p class="small"><span class="mark ${v===b.ans?"full":"wrong"}">${v===b.ans?"+10":"0"}</span> ${esc(b.why)}</p>`:""}</div>`;
+    }).join("")}
+    <div class="actions"><button class="btn" id="finish" ${all?"":"disabled"}>See your files</button></div>
+  </section>`;
+}
+
+function end(){
+  const dims = ["col","row","pay"];
+  const N = S.deck.length;
+  const pct = d => Math.round(100*S.deck.reduce((s,c,i)=>s+PTS[grade(c[d],S.ans[i][d])],0)/(N*10));
+  const pctCell = Math.round(100*S.deck.reduce((s,c,i)=>s+(PTS[grade(c.col,S.ans[i].col)]+PTS[grade(c.row,S.ans[i].row)])/2,0)/(N*10));
+  const sure = S.deck.map((c,i)=>i).filter(i=>S.ans[i].conf==="sure");
+  const sureRight = sure.filter(i=>{const c=S.deck[i],a=S.ans[i];return grade(c.col,a.col)==="full"&&grade(c.row,a.row)==="full"&&grade(c.pay,a.pay)==="full";}).length;
+  const calib = sure.length ? Math.round(100*sureRight/sure.length) : null;
+  const badge = (name,p,goal,txt) => `<div class="badge ${p!==null&&p>=goal?"won":""}"><span class="small muted">${name}</span><b>${p===null?"—":p+"%"}</b><span class="small">${txt}</span></div>`;
+  const code = makeCode();
+  const boards = S.home==="MIX"
+    ? `<div><h3>Your board</h3>${boardHTML({idx:roundIdx(1)})}</div>`
+    : `<div class="two-boards"><div style="display:grid;gap:6px"><h3>File 1 · ${esc(COUNTRIES[S.home])}</h3>${boardHTML({idx:roundIdx(0)})}</div><div style="display:grid;gap:6px"><h3>File 2 · Abroad</h3>${boardHTML({idx:roundIdx(1)})}</div></div>`;
+  return `<section class="panel">
+    <span class="eyebrow">Case closed</span>
+    <h2>${esc(S.name)}: ${S.score} points</h2>
+    <div class="badges">
+      ${badge("Cell detective",pctCell,75,pctCell>=75?"badge earned":"75% for the badge")}
+      ${badge("Payer detective",pct("pay"),75,pct("pay")>=75?"badge earned":"75% for the badge")}
+      ${badge("Stage only",pct("col"),75,"when it acts")}
+      ${badge("Sure and right",calib,75,sure.length?`${sureRight} of ${sure.length} sure cards`:"no card marked sure")}
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Your files</h2>
+    <p class="small muted">Every case in its right cell (rows: whose income; columns: when). Dashed cells are empty.</p>
+    ${boards}
+    <p>Bring two questions to Friday: <b>which cells are empty</b>, at home and abroad, and would Rodrik &amp; Stantcheva want them filled? And which of your cases <b>cost something that never appears in the budget</b>?</p>
+  </section>
+  <section class="panel">
+    <h2>Hand in</h2>
+    <p>Copy the code below and paste it into the Session 5 assignment in Classroom, then press <b>Turn in</b>. Deadline: Wednesday 28 October, 23:59. You may play again; your teacher counts your best attempt.</p>
+    <div class="code" id="code">${code}</div>
+    <div class="actions"><button class="btn ghost" id="again">Play again</button><button class="btn" id="copy">Copy code</button></div>
+    <p class="sotd">Predistribution changes what the market pays; redistribution changes what people keep. Every instrument has a cell, a mechanism and a payer, and some payers never appear in the budget.</p>
+  </section>`;
+}
+
+function makeCode(){
+  const enc = (list,k) => Math.max(0,list.findIndex(x=>x.k===k));
+  const payload = {v:2, n:S.name.trim(), h:S.home, d:S.deck.map(c=>c.id).join(","), w:S.warm,
+    a:S.ans.map(a=>""+enc(COLS,a.col)+enc(ROWS,a.row)+enc(PAYERS,a.pay)+enc(CONF,a.conf)).join(""),
+    b:S.boss.map(x=>x?1:0).join(""), s:S.score, m:Math.round((Date.now()-S.start)/60000), t:S.note.trim()};
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  return "S5-" + b64;
+}
+
+function bind(){
+  const $ = id => document.getElementById(id);
+  const ready = () => { if ($("go")) $("go").disabled = !(S.name.trim() && S.home); };
+  if ($("name")) $("name").addEventListener("input", e => { S.name = e.target.value; ready(); });
+  if ($("note")) $("note").addEventListener("input", e => { S.note = e.target.value; });
+  if ($("go")) $("go").onclick = () => { buildDeck(S.home); S.start = Date.now(); S.screen = "warm"; render(); };
+  document.querySelectorAll(".opt:not([disabled]), button.cell").forEach(b => b.onclick = () => {
+    const g = b.dataset.g, v = b.dataset.v;
+    if (g==="home"){ S.home = v; document.querySelectorAll('[data-g="home"]').forEach(x=>x.setAttribute("aria-pressed", x.dataset.v===v)); ready(); return; }
+    if ((g==="w0"||g==="w1") && S._warmDone) return;
+    if (g[0]==="b" && S.boss[+g.slice(1)]!==null) return;
+    if (["cell","pay","conf"].includes(g) && S.ans[S.i].checked) return;
+    if (g==="w0"||g==="w1"){ S.warm[+g[1]] = +v; }
+    else if (g[0]==="b"){ const i=+g.slice(1); S.boss[i] = v==="1"; S.score += (S.boss[i]===BOSS[i].ans)?10:0; }
+    else if (g==="cell"){ const [row,col] = v.split("|"); Object.assign(S.ans[S.i],{row,col}); }
+    else { S.ans[S.i][g] = v; }
+    const y = window.scrollY; render(); window.scrollTo({top:y});
+  });
+  if ($("checkw")) $("checkw").onclick = () => { S.score += (S.warm[0]===1?10:0) + (S.warm[1]===2?10:0); S._warmDone = true; const y=window.scrollY; render(); window.scrollTo({top:y}); };
+  if ($("check")) $("check").onclick = () => {
+    const c = S.deck[S.i], a = S.ans[S.i];
+    const g = [grade(c.col,a.col), grade(c.row,a.row), grade(c.pay,a.pay)];
+    let p = g.reduce((s,x)=>s+PTS[x],0);
+    if (p===30) p += 5;
+    if (a.conf==="sure") p += (p===35 ? 5 : g.includes("wrong") ? -5 : 0);
+    a.pts = p; a.checked = true; S.score += p;
+    const y = window.scrollY; render(); window.scrollTo({top:y});
+    const sc = document.querySelector(".score"); if (sc) sc.classList.add("flash");
+  };
+  if ($("next")) $("next").onclick = () => {
+    if (S.screen==="warm"){ S.screen="card"; S.i=0; }
+    else if (S.i === S.deck.length-1) S.screen = "boss";
+    else if (S.home!=="MIX" && S.i === S.nHome-1) S.screen = "interlude";
+    else S.i++;
+    render();
+  };
+  if ($("abroad")) $("abroad").onclick = () => { S.screen="card"; S.i=S.nHome; render(); };
+  if ($("finish")) $("finish").onclick = () => { S.screen="end"; render(); };
+  if ($("copy")) $("copy").onclick = async () => {
+    const t = $("code").textContent;
+    try { await navigator.clipboard.writeText(t); $("copy").textContent = "Copied"; }
+    catch(e){ const r=document.createRange(); r.selectNodeContents($("code")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); $("copy").textContent = "Selected: press Ctrl+C"; }
+  };
+  if ($("again")) $("again").onclick = () => { Object.assign(S,{_warmDone:false,screen:"intro",deck:[],nHome:0,warm:[null,null],i:0,ans:[],boss:BOSS.map(()=>null),score:0,start:null,note:""}); render(); };
+}
+
+render();
+</script>
+</body></html>
