@@ -401,8 +401,13 @@ function intro(){
   const ready = S.name.trim() && S.home;
   return `<header style="display:grid;gap:10px">
     <h1>Matrix Detective</h1>
-    <p class="muted">You are a new policy adviser. Your first file is a country you know; your second file is a study trip abroad. For each real policy you decide <b>where it sits</b> in the matrix, <b>who pays</b>, and <b>how sure you are</b>. About 15–20 minutes. Read Rodrik &amp; Stantcheva (2021), pp. 1–6, first.</p>
+    <p class="muted">You are a new policy adviser. Your first file is a country you know; your second file is a study trip abroad. For each real policy you decide <b>where it sits</b> in the matrix, <b>who pays</b>, and <b>how sure you are</b>. About 15–20 minutes.</p>
   </header>
+  <section class="panel" style="gap:8px">
+    <span class="eyebrow">Read first · about 40 minutes</span>
+    <p><b>Rodrik, D., &amp; Stantcheva, S. (2021). <i>A policy matrix for inclusive prosperity.</i></b> NBER Working Paper 28736. Read pp. 1–6 and the matrix in Figure 1 on p. 8. The one-page reading guide is in Classroom.</p>
+    <p><a href="https://www.nber.org/system/files/working_papers/w28736/w28736.pdf" target="_blank" rel="noopener" style="color:inherit;font-weight:600">Open the paper (PDF) ↗</a> · <a href="https://www.nber.org/papers/w28736" target="_blank" rel="noopener" style="color:inherit">NBER page ↗</a></p>
+  </section>
   <section class="panel">
     <h2>The tool: one matrix</h2>
     ${stripHTML(null)}
